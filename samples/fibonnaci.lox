@@ -1,0 +1,12 @@
+fun fibonnaci(n) {
+    if (n == 1 or n < 1){
+        return n;
+    } else {
+        return fibonnaci(n-1) + fibonnaci(n-2);
+    }
+}
+
+var nterms = 10;
+for (var a = 0; a < nterms; a = a+1){
+    print fibonnaci(a);
+} 
