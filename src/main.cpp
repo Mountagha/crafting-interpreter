@@ -1,6 +1,17 @@
-#include <iostream>
+#include <iostream> // for debugging purposes
+#include "lox.hpp"
 
-int main() {
-    std::cout << "welcome in the world of PL\n" ;
+using namespace lox;
+
+
+int main(int argc, char *argv[]) {
+    if (argc > 2) {
+        std::cerr << "Usage: jlox [script]" << std::endl;
+        exit(64);
+    } else if (argc == 2){
+        Lox::runFile(argv[1]);
+    } else {
+        Lox::runPrompt();
+    }
     return 0;
 }
