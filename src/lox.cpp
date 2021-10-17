@@ -1,5 +1,3 @@
-#pragma once
-
 #include <iostream> // for debugging
 #include <fstream>
 #include <sstream>

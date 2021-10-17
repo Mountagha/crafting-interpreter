@@ -2,7 +2,9 @@
 
 #include "token.hpp"
 #include "lox.hpp"
+#include "literal.h"
 #include <vector>
+#include <map>
 
 namespace lox {
     
@@ -68,6 +70,8 @@ class Scanner {
                 default:
                     if (isDigit(c)) {
                         number();
+                    } else if (isalpha(c)) {
+                        identifier();
                     } else {
                         Lox::error(line, "Unexpected character");
                     }
@@ -91,6 +95,11 @@ class Scanner {
             std::string text = source.substr(start, current-start+1);
             tokens.push_back(Token(token_type, text, literal, line));
         }
+        
+        // @TODO: Handle it with std::optional & std::variant
+        //void addToken(TokenType token_type, double n) {
+        //    tokens.push_back(Token())
+        //}
 
         bool match(char expected) {
             if (isAtEnd()) return false;
@@ -133,9 +142,50 @@ class Scanner {
                 while(isDigit(peek())) advance();
             }
 
-            addToken(NUMBER, std::stod(source.substr(start, current-start+1)));
+            addToken(NUMBER, source.substr(start, current-start+1)); // later stock as double
 
         }
+
+        char peekNext() {
+            if (current + 1 >= source.size()) return '\0';
+            return source[ current + 1 ];
+        }
+
+        void identifier() {
+            while(isalnum(peek())) advance();
+            std::string text = source.substr(start, current-start+1);
+            addToken(reserved_or_identifier(text));
+        }
+
+        TokenType reserved_or_identifier(const std::string& str){
+            static const std::map<std::string, TokenType> keywords{
+                {"and", AND},
+                {"class", CLASS},
+                {"else", ELSE}, 
+                {"false", FALSE},
+                {"for", FOR},
+                {"fun", FUN},
+                {"if", IF},
+                {"nil", NIL},
+                {"or", OR},
+                {"print", PRINT},
+                {"return", RETURN},
+                {"super", SUPER},
+                {"this", THIS},
+                {"true", TRUE},
+                {"while", WHILE},
+                {"var", VAR},
+            };
+
+            auto iter = keywords.find(str);
+            if (iter == keywords.end()){
+                return IDENTIFIER;
+            }
+            return iter->second;
+        }
+
+        
+
 
 
 
