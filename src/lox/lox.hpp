@@ -7,4 +7,4 @@ class Lox {
         void Run();
 };
 
-}
+} // namespace lox
