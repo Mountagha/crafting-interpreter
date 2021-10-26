@@ -5,6 +5,7 @@
 #include "literal.h"
 #include <vector>
 #include <map>
+#include <iostream>
 
 namespace lox {
     
@@ -71,9 +72,10 @@ class Scanner {
                 default:
                     if (isDigit(c)) {
                         number();
-                    } else if (isalpha(c)) {
+                    } else if (isAlpha(c)) {
                         identifier();
                     } else {
+                        std::cout << c ;
                         Lox::error(line, "Unexpected character");
                     }
                     break;
