@@ -3,7 +3,7 @@
 
 namespace lox {
 
-Scanner::Scanner(std::string source): 
+Scanner::Scanner(const std::string& source): 
     source{source}, start{0}, current{0}, line{0} 
 {}
 

@@ -2,21 +2,24 @@
 
 #include "token.hpp"
 #include "lox.hpp"
+#include "literal.h"
 #include <vector>
+#include <map>
+#include <iostream>
 
 namespace lox {
     
 class Scanner {
 
     public:
-        Scanner(std::string source);
+        Scanner(const std::string& source);
         std::vector<Token> scanTokens();
 
     private:
         unsigned int start;
         unsigned int current;
         unsigned int line;
-        std::string source;
+        const std::string& source;
         std::vector<Token> tokens;
 
         inline bool isAtEnd() const { return current > source.length(); }
@@ -62,13 +65,17 @@ class Scanner {
                     break;
                 case '\n':
                     line++;
+                    break;
                 
                 // literals
                 case '"': string(); break;
                 default:
                     if (isDigit(c)) {
                         number();
+                    } else if (isAlpha(c)) {
+                        identifier();
                     } else {
+                        std::cout << c ;
                         Lox::error(line, "Unexpected character");
                     }
                     break;
@@ -79,8 +86,18 @@ class Scanner {
             return c >= '0' && c <= '9';
         }
 
-        inline char advance() const {
-            return source.at(current);
+        inline bool isAlpha(char c) {
+            return (c >= 'a' && c <= 'z' ||
+                    c >= 'A' && c <= 'Z' ||
+                    c == '_');
+        }
+        
+        inline bool is_alphanumeric(char c){
+            return isAlpha(c) || isDigit(c);
+        }
+
+        inline char advance() {
+            return source[current++];
         }
 
         void addToken(TokenType token_type){
@@ -91,6 +108,11 @@ class Scanner {
             std::string text = source.substr(start, current-start+1);
             tokens.push_back(Token(token_type, text, literal, line));
         }
+        
+        // @TODO: Handle it with std::optional & std::variant
+        //void addToken(TokenType token_type, double n) {
+        //    tokens.push_back(Token())
+        //}
 
         bool match(char expected) {
             if (isAtEnd()) return false;
@@ -101,7 +123,7 @@ class Scanner {
 
         char peek() {
             if (isAtEnd()) return '\0';
-            return source.at(current);
+            return source[current];
         } 
 
         void string() {
@@ -133,9 +155,50 @@ class Scanner {
                 while(isDigit(peek())) advance();
             }
 
-            addToken(NUMBER, std::stod(source.substr(start, current-start+1)));
+            addToken(NUMBER, source.substr(start, current-start+1)); // later stock as double
 
         }
+
+        char peekNext() {
+            if (current + 1 >= source.size()) return '\0';
+            return source[ current + 1 ];
+        }
+
+        void identifier() {
+            while(is_alphanumeric(peek())) advance();
+            std::string text = source.substr(start, current-start+1);
+            addToken(reserved_or_identifier(text));
+        }
+
+        TokenType reserved_or_identifier(const std::string& str){
+            static const std::map<std::string, TokenType> keywords{
+                {"and", AND},
+                {"class", CLASS},
+                {"else", ELSE}, 
+                {"false", FALSE},
+                {"for", FOR},
+                {"fun", FUN},
+                {"if", IF},
+                {"nil", NIL},
+                {"or", OR},
+                {"print", PRINT},
+                {"return", RETURN},
+                {"super", SUPER},
+                {"this", THIS},
+                {"true", TRUE},
+                {"while", WHILE},
+                {"var", VAR},
+            };
+
+            auto iter = keywords.find(str);
+            if (iter == keywords.end()){
+                return IDENTIFIER;
+            }
+            return iter->second;
+        }
+
+        
+
 
 
 

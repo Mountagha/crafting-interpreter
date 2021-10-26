@@ -3,7 +3,6 @@
 #include <string>
 
 namespace lox {
-class Literal;
 
 enum TokenType {
     // Single character tokens
@@ -28,8 +27,8 @@ enum TokenType {
 
 class Token {
     public:
-        Token(TokenType token_type, std::string lexeme, std::string literal, int line);
-        inline std::string to_string() const;
+        Token(TokenType token_type, std::string lexeme, std::string literal, unsigned int line);
+        inline std::string enum_to_string(TokenType token) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Token& token);
     private:

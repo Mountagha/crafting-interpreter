@@ -1,5 +1,3 @@
-#pragma once
-
 #include <iostream> // for debugging
 #include <fstream>
 #include <sstream>
@@ -21,7 +19,7 @@ void Lox::error(int line, std::string message) {
     report(line, "", message);
 }
 
-void Lox::run (std::string source) {
+void Lox::run (const std::string& source) {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
 
