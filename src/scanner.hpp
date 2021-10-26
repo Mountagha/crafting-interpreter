@@ -11,14 +11,14 @@ namespace lox {
 class Scanner {
 
     public:
-        Scanner(std::string source);
+        Scanner(const std::string& source);
         std::vector<Token> scanTokens();
 
     private:
         unsigned int start;
         unsigned int current;
         unsigned int line;
-        std::string source;
+        const std::string& source;
         std::vector<Token> tokens;
 
         inline bool isAtEnd() const { return current > source.length(); }
@@ -64,6 +64,7 @@ class Scanner {
                     break;
                 case '\n':
                     line++;
+                    break;
                 
                 // literals
                 case '"': string(); break;
@@ -83,8 +84,18 @@ class Scanner {
             return c >= '0' && c <= '9';
         }
 
-        inline char advance() const {
-            return source.at(current);
+        inline bool isAlpha(char c) {
+            return (c >= 'a' && c <= 'z' ||
+                    c >= 'A' && c <= 'Z' ||
+                    c == '_');
+        }
+        
+        inline bool is_alphanumeric(char c){
+            return isAlpha(c) || isDigit(c);
+        }
+
+        inline char advance() {
+            return source[current++];
         }
 
         void addToken(TokenType token_type){
@@ -110,7 +121,7 @@ class Scanner {
 
         char peek() {
             if (isAtEnd()) return '\0';
-            return source.at(current);
+            return source[current];
         } 
 
         void string() {
@@ -152,7 +163,7 @@ class Scanner {
         }
 
         void identifier() {
-            while(isalnum(peek())) advance();
+            while(is_alphanumeric(peek())) advance();
             std::string text = source.substr(start, current-start+1);
             addToken(reserved_or_identifier(text));
         }
