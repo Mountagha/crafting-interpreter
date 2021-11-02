@@ -45,6 +45,7 @@ void Lox::runPrompt() {
         std::cout << "> ";
         std::string line;
         if(!getline(std::cin, line)) break;
+        //std::erase(std::find(line.begin(), line.end(), '\0'));
         run(line);
     }
 }
