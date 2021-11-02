@@ -61,7 +61,8 @@ class Scanner {
                 case ' ':
                 case '\r':
                 case '\t':
-                    // ignore whitespaces
+                case '\0':
+                    // ignore whitespaces && nul characters
                     break;
                 case '\n':
                     line++;
@@ -75,7 +76,6 @@ class Scanner {
                     } else if (isAlpha(c)) {
                         identifier();
                     } else {
-                        std::cout << c ;
                         Lox::error(line, "Unexpected character");
                     }
                     break;
@@ -105,7 +105,7 @@ class Scanner {
         }
 
         void addToken(TokenType token_type, std::string literal) {
-            std::string text = source.substr(start, current-start+1);
+            std::string text = source.substr(start, current-start);
             tokens.push_back(Token(token_type, text, literal, line));
         }
         
@@ -116,7 +116,7 @@ class Scanner {
 
         bool match(char expected) {
             if (isAtEnd()) return false;
-            if (source.at(current) != expected) return false;
+            if (source[current] != expected) return false;
             current++;
             return true;
         }
@@ -133,7 +133,7 @@ class Scanner {
             }
 
             if(isAtEnd()) {
-                Lox::error(line, "Unterminted string.");
+                Lox::error(line, "Unterminated string.");
                 return;
             }
 
@@ -141,7 +141,7 @@ class Scanner {
             advance();
 
             // trim the surrounding quotes
-            std::string value = source.substr(start+1, current-start);
+            std::string value = source.substr(start+1, current-start-2);
             addToken(STRING, value);
         }
 
@@ -155,7 +155,7 @@ class Scanner {
                 while(isDigit(peek())) advance();
             }
 
-            addToken(NUMBER, source.substr(start, current-start+1)); // later stock as double
+            addToken(NUMBER, source.substr(start, current-start)); // later stock as double
 
         }
 
@@ -166,7 +166,7 @@ class Scanner {
 
         void identifier() {
             while(is_alphanumeric(peek())) advance();
-            std::string text = source.substr(start, current-start+1);
+            std::string text = source.substr(start, current-start);
             addToken(reserved_or_identifier(text));
         }
 
