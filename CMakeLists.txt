@@ -10,4 +10,4 @@ include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
 
 # Add an executable
-add_executable(interpreter *.cpp)
+add_executable(interpreter ${SOURCES})
