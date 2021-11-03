@@ -1,5 +1,5 @@
 #include <iostream> // for debugging purposes
-#include "lox.hpp"
+#include "include/lox.hpp"
 
 using namespace lox;
 

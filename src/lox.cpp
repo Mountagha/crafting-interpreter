@@ -1,8 +1,8 @@
 #include <iostream> // for debugging
 #include <fstream>
 #include <sstream>
-#include "scanner.hpp"
-#include "lox.hpp"
+#include "include/scanner.hpp"
+#include "include/lox.hpp"
 
 namespace lox{
 
