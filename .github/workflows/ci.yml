@@ -15,11 +15,11 @@ jobs:
     - uses: actions/checkout@v2
     - name: building application
       run: |
-        pwd
+        cd src
         mkdir build
         cd build
         cmake ..
         make
-        ./out
+        ./interpreter
         cd ..
         rm -r build
