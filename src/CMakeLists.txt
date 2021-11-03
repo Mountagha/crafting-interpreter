@@ -7,4 +7,4 @@ cmake_minimum_required(VERSION 3.5)
 project (crafting-interpreters)
 
 # Add an executable
-add_executable(out main.cpp)
+add_executable(interpreter *.cpp)

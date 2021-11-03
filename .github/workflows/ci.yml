@@ -15,6 +15,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: building application
       run: |
+        pwd
         mkdir build
         cd build
         cmake ..
