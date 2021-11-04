@@ -2,7 +2,7 @@
 
 #include "token.hpp"
 #include "lox.hpp"
-#include "literal.h"
+#include "literal.hpp"
 #include <vector>
 #include <map>
 #include <iostream>

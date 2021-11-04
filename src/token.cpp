@@ -1,4 +1,4 @@
-#include "include/token.hpp"
+#include "token.hpp"
 
 namespace lox {
 

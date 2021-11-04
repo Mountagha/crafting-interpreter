@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.5)
 # Set the project name
 project (crafting-interpreters)
 
-include_directories(include)
+include_directories("include")
 file(GLOB SOURCES "src/*.cpp")
 
 # Add an executable
