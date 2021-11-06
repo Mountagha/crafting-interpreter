@@ -5,6 +5,7 @@
 #include "literal.hpp"
 #include <vector>
 #include <map>
+#include <stack>
 #include <iostream>
 
 namespace lox {
@@ -54,6 +55,26 @@ class Scanner {
                     if (match('/')) {
                         // A comment goes until the end of the line
                         while (peek() != '\n' && !isAtEnd()) advance();
+                    } else if (match('*')) {
+                        // A C/C++ long comment like with possibility of nesting
+                        std::stack<int> stack;
+                        stack.push(1);
+                        while(!stack.empty() && !isAtEnd()) {
+                            if (peek() == '\n') line++;
+                            else if (peek() == '/' && peekNext() == '*'){
+                                stack.push(1);
+                                advance();
+                            }
+                            else if (peek() == '*' && peekNext() == '/') {
+                                stack.pop();
+                                advance();
+                            }
+                            advance();
+                        }
+                        if (!stack.empty()) { 
+                            Lox::error(line, "Unterminated comment");
+                            return;
+                        }
                     } else {
                         addToken(SLASH);
                     }

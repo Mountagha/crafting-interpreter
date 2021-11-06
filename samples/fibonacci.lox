@@ -1,12 +1,14 @@
 fun fibonnaci(n) {
+/* This function compute the fibonnaci value recursively **/ 
     if (n == 1 or n < 1){
         return n;
     } else {
         return fibonnaci(n-1) + fibonnaci(n-2);
     }
 }
+// this is a short comment
 
 var nterms = 10;
 for (var a = 0; a < nterms; a = a+1){
     print fibonnaci(a);
-} 
+}
