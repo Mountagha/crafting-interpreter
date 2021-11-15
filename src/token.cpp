@@ -2,7 +2,7 @@
 
 namespace lox {
 
-Token::Token(TokenType token_type, std::string lexeme, std::string literal, unsigned int line):
+Token::Token(TokenType token_type, std::string lexeme, std::any literal, unsigned int line):
     token_type{token_type}, lexeme{lexeme}, literal{literal}, line{line}
 {}
 
@@ -18,8 +18,29 @@ inline std::string Token::enum_to_string(TokenType token) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Token& token){
-    os << token.enum_to_string(token.token_type) + " " + 
-    token.lexeme + " " + token.literal;
+    std::string literal_value;
+    switch(token.token_type) {
+        case (IDENTIFIER):
+            literal_value = token.lexeme;
+            break;
+        case (STRING):
+            literal_value = std::any_cast<std::string>(token.literal);
+            break;
+        case (NUMBER):
+            literal_value = std::to_string(std::any_cast<double>(token.literal);
+            break;
+        case (TRUE):
+            literal_value = "true";
+            break;
+        case (FALSE):
+            literal_value = "false";
+            break;
+        default:
+            literal_value = "nil";
+            break;
+    }
+    os << token.enum_to_string(token.token_type) + " " + \ 
+    token.lexeme + " " + literal_value;
     return os;
 }
 

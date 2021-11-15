@@ -122,15 +122,15 @@ class Scanner {
         }
 
         void addToken(TokenType token_type){
-            addToken(token_type, "");
+            addToken(token_type, "nil");
         }
 
-        void addToken(TokenType token_type, std::string literal) {
+        void addToken(TokenType token_type, std::any literal) {
             std::string text = source.substr(start, current-start);
             tokens.push_back(Token(token_type, text, literal, line));
         }
         
-        // @TODO: Handle it with std::optional & std::variant
+        // @TODO: Handle it with std::optional & std::variant later maybe
         //void addToken(TokenType token_type, double n) {
         //    tokens.push_back(Token())
         //}
@@ -176,7 +176,7 @@ class Scanner {
                 while(isDigit(peek())) advance();
             }
 
-            addToken(NUMBER, source.substr(start, current-start)); // later stock as double
+            addToken(NUMBER, std::stod(source.substr(start, current-start))); // later stock as double
 
         }
 
@@ -217,11 +217,6 @@ class Scanner {
             }
             return iter->second;
         }
-
-        
-
-
-
 
 };
 }
