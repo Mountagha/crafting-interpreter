@@ -38,3 +38,9 @@ class ASTprinter: public Visitor<std::string> {
 };
 
 } // namespace lox
+
+using namespace lox;
+
+int main(int argc, char *argv[]){
+    Expr<std::string> expression()
+}
