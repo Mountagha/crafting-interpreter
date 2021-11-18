@@ -3,6 +3,8 @@
 # $ cmake --version
 cmake_minimum_required(VERSION 3.5)
 
+# set the c++ version
+set(CMAKE_CXX_STANDARD 17)
 # Set the project name
 project (crafting-interpreters)
 

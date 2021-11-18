@@ -27,7 +27,7 @@ std::ostream& operator<<(std::ostream& os, const Token& token){
             literal_value = std::any_cast<std::string>(token.literal);
             break;
         case (NUMBER):
-            literal_value = std::to_string(std::any_cast<double>(token.literal);
+            literal_value = std::to_string(std::any_cast<double>(token.literal));
             break;
         case (TRUE):
             literal_value = "true";
