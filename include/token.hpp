@@ -28,10 +28,11 @@ enum TokenType {
 
 class Token {
     public:
+        Token() = default;
         Token(TokenType token_type, std::string lexeme, std::any literal, unsigned int line);
         inline std::string enum_to_string(TokenType token) const;
         friend std::ostream& operator<<(std::ostream& os, const Token& token);
-    private:
+
         TokenType token_type;
         std::string lexeme;
         std::any literal; 

@@ -7,10 +7,10 @@
 namespace lox {
 using namespace AST;
 
-class ASTprinter: public Visitor<std::string> {
+class ASTprinter: public Visitor {
     public:
-        std::string print(Expr<std::string>& expr) {
-            return expr.accept(*this);
+        std::string print(Expr& expr) {
+            return std::any_cast<std::string>(expr.accept(*this));
         }
 
         std::string visitBinaryExpr(Binary<std::string>& expr) {

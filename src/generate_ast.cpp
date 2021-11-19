@@ -10,10 +10,15 @@ bool isPointer(const std::string& s) {
     return s.size() && s.back() == '*';
 }
 
+std::string type_from_ptr(const std::string& s){
+    return s.substr(0, s.size()-1); // return string without *
+}
+
 void declare_classes(std::ostream& out, std::map<std::string, std::string> map) {
     for (const auto& e: map){
-        out << "class " + e.first + "\n";
+        out << "class " + e.first + ";\n";
     }
+    out << "\n";
 } 
 
 std::vector<std::string> split(std::string s, std::string sep) {
@@ -50,23 +55,34 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     out << "\tpublic:\n";
     // Constructor
     out << "\t\t" + classname + "(";
-    for (const auto& field: fieldList) {
+    std::string line;
+    for (const std::string& field: fieldList) {
         // separate name from type
         std::vector<std::string> name_type = split(field, " ");
-        if (isPointer(name_type[0]))    
-            out << "std::unique_ptr<" + name_type[0] + "> " + name_type[1] + ", ";
+        if (isPointer(name_type[0]))
+            line += "std::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ", ";
         else 
-            out << field << ", ";
+            line += field + ", "; 
     }
-    out << ")\n";
+    // remove last comma
+    line = line.substr(0, line.size()-2);
+    out << line + ") {\n"; 
+     
     //store parameters in fields
+    
     for (const auto& field: fieldList) {
-        std::string name = split(field, " ")[1];
-        out << "\t\t\t" + name + " = " + name + ";\n";
+        std::vector<std::string> name_type = split(field, " ");
+        if (isPointer(name_type[0]))
+            out << "\t\t\t" + name_type[1] + " = std::move (" + name_type[1] + ");\n";
+        else
+            out << "\t\t\t" + name_type[1] + " = " + name_type[1] + ";\n";
+
     }
+    
+    
     out << "\t\t}\n";
     // Visitor pattern
-    out << "\t\tT accept(Visitor& visitor) override {\n";
+    out << "\t\tstd::any accept(Visitor& visitor) override {\n";
     out << "\t\t\treturn visitor.visit" + classname + basename + "(*this);\n";
     out << "\t\t}\n";
     // fields
@@ -90,8 +106,11 @@ void defineAST(
         std::cerr << "Unable to open the file for writing";
         std::exit(65);
     }
-    out << "#include \"token.hpp\"\n\n";
+    out << "#include \"token.hpp\"\n";
+    out << "#include <memory>\n\n";
     out << "namespace lox { namespace AST { \n\n";
+    // declare classes
+    declare_classes(out, map);
     // Define visitor class 
     defineVisitor(out, basename, map);
     // define base class
@@ -103,9 +122,10 @@ void defineAST(
 
     for (auto& e: map) {
         std::string classname = e.first;
-        std::vector<std::string> fields = split(e.second, " ");
+        std::vector<std::string> fields = split(e.second, ", ");
         define_type(out, basename, classname, fields);
     }
+    
     out << "} // AST namespace\n";
     out << "} // lox namespace";
 
