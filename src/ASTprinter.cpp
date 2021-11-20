@@ -1,7 +1,8 @@
 #include <iostream>
-#include "Expr.hpp"
+#include "../include/Expr.hpp"
 #include <vector>
 #include <sstream>
+#include "../include/token.hpp"
 
 
 namespace lox {
@@ -9,31 +10,38 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        std::string print(Expr& expr) {
+        std::any print(Expr& expr) {
             return std::any_cast<std::string>(expr.accept(*this));
         }
 
-        std::string visitBinaryExpr(Binary<std::string>& expr) {
-            return "a";
+        std::any visitBinaryExpr(Binary& expr) override {
+            // std::vector<std::unique_ptr<Expr>> v {expr.left, expr.right};
+            return parenthesize(expr.operator_.lexeme, {expr.left, expr.right});
         }
 
-        std::string visitGroupingExpr(Grouping<std::string>& expr){
-            return "b";
+        std::any visitGroupingExpr(Grouping& expr) override {
+            return parenthesize("group", {expr.expression});
         }
 
-        std::string visitLiteralExpr(Literal<std::string> expr) {
-            return "c";
+        std::any visitLiteralExpr(Literal& expr) override {
+            if ( expr.value.has_value() ) 
+                return std::any_cast<std::string>(expr.value);
+            else 
+                return std::any_cast<std::string>("nil");
         }
 
-        std::string visitUnaryExpr(Unary<std::string> expr) {
-            return "d";
+        std::any visitUnaryExpr(Unary& expr) override {
+            return parenthesize(expr.operator_.lexeme, {expr.right});
         }
     private: 
-        std::string parenthesize(std::string name, std::vector<Expr<std::string>> exprs){
+        std::any parenthesize(std::string name, const std::vector<std::shared_ptr<Expr>>& exprs){
             std::stringstream ss;
             ss << "(" + name;
-            return ss.str();
-
+            for (const auto& expr: exprs) {
+                ss << " ";
+                ss << std::any_cast<std::string>(expr->accept(*this));
+            }
+            return std::any_cast<std::string>(ss.str());
         }
 };
 
@@ -42,5 +50,15 @@ class ASTprinter: public Visitor {
 using namespace lox;
 
 int main(int argc, char *argv[]){
-    //Expr<std::string> expression()
+    std::shared_ptr<Expr> expression = std::make_shared<Binary>(
+                                        std::make_shared<Unary>(
+                                        Token{MINUS, "-", nullptr, 1},
+                                        std::make_shared<Literal>(123.)
+                                        ),
+                                        Token{STAR, "*", nullptr, 1},
+                                        std::make_shared<Grouping>(
+                                            std::make_shared<Literal>(45.76)
+                                        )
+    );
+    //std::cout << ASTprinter{}.print(expression);
 }

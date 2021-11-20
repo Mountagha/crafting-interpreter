@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 project (crafting-interpreters)
 
 include_directories("include")
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "src/ASTprinter.cpp")
 
 # Add an executable
 add_executable(interpreter ${SOURCES})

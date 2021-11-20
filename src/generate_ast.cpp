@@ -60,7 +60,7 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
         // separate name from type
         std::vector<std::string> name_type = split(field, " ");
         if (isPointer(name_type[0]))
-            line += "std::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ", ";
+            line += "std::shared_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ", ";
         else 
             line += field + ", "; 
     }
@@ -88,7 +88,11 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     // fields
     //out << "\tprivate:\n";
     for (const auto& field: fieldList) {
-        out << "\t\t" + field + ";\n";
+        std::vector<std::string> name_type = split(field, " ");
+            if (isPointer(name_type[0]))
+                out << "\t\tstd::shared_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ";\n";
+            else 
+                out << "\t\t" + field + ";\n";
     }
     out << "};\n\n";
     
@@ -117,6 +121,8 @@ void defineAST(
     // out << "template<typename T>\n";
     out << "class " + basename + " {\n\n";
     out << "\tpublic:\n";
+    out << "\t\t" + basename + "() = default;\n";
+    out << "\t\t~" + basename + "() = default;\n";
     out << "\t\tvirtual std::any accept(Visitor& visitor) = 0;\n";
     out << "};\n\n";
 
