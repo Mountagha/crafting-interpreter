@@ -2,7 +2,7 @@
 #include "../include/Expr.hpp"
 #include <vector>
 #include <sstream>
-#include "../include/token.hpp"
+// #include "../include/token.hpp"
 
 
 namespace lox {
@@ -10,17 +10,16 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        std::any print(Expr& expr) {
-            return std::any_cast<std::string>(expr.accept(*this));
+        std::string print(const std::unique_ptr<Expr>& expr) {
+            return std::any_cast<std::string>(expr->accept(*this));
         }
 
         std::any visitBinaryExpr(Binary& expr) override {
-            // std::vector<std::unique_ptr<Expr>> v {expr.left, expr.right};
-            return parenthesize(expr.operator_.lexeme, {expr.left, expr.right});
+            return parenthesize(expr.operator_.lexeme, {expr.left.get(), expr.right.get()});
         }
 
         std::any visitGroupingExpr(Grouping& expr) override {
-            return parenthesize("group", {expr.expression});
+            return parenthesize("group", {expr.expression.get()});
         }
 
         std::any visitLiteralExpr(Literal& expr) override {
@@ -31,10 +30,10 @@ class ASTprinter: public Visitor {
         }
 
         std::any visitUnaryExpr(Unary& expr) override {
-            return parenthesize(expr.operator_.lexeme, {expr.right});
+            return parenthesize(expr.operator_.lexeme, {expr.right.get()});
         }
     private: 
-        std::any parenthesize(std::string name, const std::vector<std::shared_ptr<Expr>>& exprs){
+        std::any parenthesize(std::string name, const std::vector<Expr*> exprs){
             std::stringstream ss;
             ss << "(" + name;
             for (const auto& expr: exprs) {
@@ -50,15 +49,16 @@ class ASTprinter: public Visitor {
 using namespace lox;
 
 int main(int argc, char *argv[]){
-    std::shared_ptr<Expr> expression = std::make_shared<Binary>(
-                                        std::make_shared<Unary>(
-                                        Token{MINUS, "-", nullptr, 1},
-                                        std::make_shared<Literal>(123.)
+    /*std::unique_ptr<Expr> expression = std::make_unique<Binary>(
+                                        std::make_unique<Unary>(
+                                        Token{MINUS, "-", "", 1},
+                                        std::make_unique<Literal>(123.)
                                         ),
-                                        Token{STAR, "*", nullptr, 1},
-                                        std::make_shared<Grouping>(
-                                            std::make_shared<Literal>(45.76)
+                                        Token{STAR, "*", "", 1},
+                                        std::make_unique<Grouping>(
+                                            std::make_unique<Literal>(45.76)
                                         )
-    );
-    //std::cout << ASTprinter{}.print(expression);
+    ); */
+    std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
+    std::cout << ASTprinter{}.print(expression);
 }

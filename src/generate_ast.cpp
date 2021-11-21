@@ -60,7 +60,7 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
         // separate name from type
         std::vector<std::string> name_type = split(field, " ");
         if (isPointer(name_type[0]))
-            line += "std::shared_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ", ";
+            line += "std::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ", ";
         else 
             line += field + ", "; 
     }
@@ -90,7 +90,7 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     for (const auto& field: fieldList) {
         std::vector<std::string> name_type = split(field, " ");
             if (isPointer(name_type[0]))
-                out << "\t\tstd::shared_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ";\n";
+                out << "\t\tstd::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ";\n";
             else 
                 out << "\t\t" + field + ";\n";
     }
