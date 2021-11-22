@@ -8,8 +8,10 @@ set(CMAKE_CXX_STANDARD 17)
 # Set the project name
 project (crafting-interpreters)
 
+add_compile_options(-g)
+
 include_directories("include")
-file(GLOB SOURCES "src/ASTprinter.cpp")
+file(GLOB SOURCES "src/ASTprinter.cpp", "src/token.cpp")
 
 # Add an executable
 add_executable(interpreter ${SOURCES})
