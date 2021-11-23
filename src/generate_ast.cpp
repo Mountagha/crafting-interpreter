@@ -59,9 +59,9 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     for (const std::string& field: fieldList) {
         // separate name from type
         std::vector<std::string> name_type = split(field, " ");
-        if (isPointer(name_type[0]))
-            line += "std::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ", ";
-        else 
+        //if (isPointer(name_type[0]))
+        //    line += "std::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ", ";
+        //else 
             line += field + ", "; 
     }
     // remove last comma
@@ -72,9 +72,9 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     
     for (const auto& field: fieldList) {
         std::vector<std::string> name_type = split(field, " ");
-        if (isPointer(name_type[0]))
-            out << "\t\t\t" + name_type[1] + " = std::move (" + name_type[1] + ");\n";
-        else
+        //if (isPointer(name_type[0]))
+        //    out << "\t\t\t" + name_type[1] + " = std::move (" + name_type[1] + ");\n";
+        //else
             out << "\t\t\t" + name_type[1] + " = " + name_type[1] + ";\n";
 
     }
@@ -89,9 +89,9 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     //out << "\tprivate:\n";
     for (const auto& field: fieldList) {
         std::vector<std::string> name_type = split(field, " ");
-            if (isPointer(name_type[0]))
-                out << "\t\tstd::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ";\n";
-            else 
+            //if (isPointer(name_type[0]))
+            //    out << "\t\tstd::unique_ptr<" + type_from_ptr(name_type[0]) + "> " + name_type[1] + ";\n";
+            //else 
                 out << "\t\t" + field + ";\n";
     }
     out << "};\n\n";
