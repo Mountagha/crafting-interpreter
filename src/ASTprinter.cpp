@@ -10,7 +10,7 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        std::string print(std::unique_ptr<Expr>& expr) {
+        std::string print(Expr* expr) {
             return std::any_cast<std::string>(expr->accept(*this));
         }
 
@@ -62,5 +62,5 @@ int main(int argc, char *argv[]){
     );*/ 
     //std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
     std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
-    std::cout << ASTprinter{}.print(expression);
+    std::cout << ASTprinter{}.print(expression.get());
 }
