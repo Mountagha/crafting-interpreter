@@ -10,8 +10,8 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        std::any print(Expr& expr) {
-            return std::any_cast<std::string>(expr.accept(*this));
+        std::any print(std::unique_ptr<Expr>& expr) {
+            return std::any_cast<std::string>(expr->accept(*this));
         }
 
         std::any visitBinaryExpr(Binary& expr) override {
