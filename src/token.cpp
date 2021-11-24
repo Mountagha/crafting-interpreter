@@ -39,7 +39,7 @@ std::ostream& operator<<(std::ostream& os, const Token& token){
             literal_value = "nil";
             break;
     }
-    os << token.enum_to_string(token.token_type) + " " + \ 
+    os << token.enum_to_string(token.token_type) + " " + \
     token.lexeme + " " + literal_value;
     return os;
 }
