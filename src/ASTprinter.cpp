@@ -10,16 +10,16 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        std::string print(Expr* expr) {
+        std::string print(std::unique_ptr<Expr>& expr) {
             return std::any_cast<std::string>(expr->accept(*this));
         }
 
         std::any visitBinaryExpr(Binary& expr) override {
-            return parenthesize(expr.operator_.lexeme, {expr.left, expr.right});
+            return parenthesize(expr.operator_.lexeme, {expr.left.get(), expr.right.get()});
         }
 
         std::any visitGroupingExpr(Grouping& expr) override {
-            return parenthesize("group", {expr.expression});
+            return parenthesize("group", {expr.expression.get()});
         }
 
         std::any visitLiteralExpr(Literal& expr) override {
@@ -30,7 +30,7 @@ class ASTprinter: public Visitor {
         }
 
         std::any visitUnaryExpr(Unary& expr) override {
-            return parenthesize(expr.operator_.lexeme, {expr.right});
+            return parenthesize(expr.operator_.lexeme, {expr.right.get()});
         }
     private: 
         // template<class... E> 
@@ -60,7 +60,6 @@ int main(int argc, char *argv[]){
                                             std::make_unique<Literal>(45.76)
                                         )
     );*/ 
-    //std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
-    Expr* expression = new Unary(Token{MINUS, "-", "", 1}, new Literal(123.));
+    std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
     std::cout << ASTprinter{}.print(expression);
 }
