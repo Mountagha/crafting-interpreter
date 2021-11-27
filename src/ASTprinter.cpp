@@ -10,7 +10,7 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        std::string print(std::unique_ptr<Expr>& expr) {
+        std::string print(Expr* expr) {
             return std::any_cast<std::string>(expr->accept(*this));
         }
 
@@ -30,7 +30,7 @@ class ASTprinter: public Visitor {
         }
 
         std::any visitUnaryExpr(Unary& expr) override {
-            return parenthesize(expr.operator_.lexeme, {expr.right.get()});
+            //return parenthesize(expr.operator_.lexeme, {expr.right});
         }
     private: 
         // template<class... E> 
@@ -60,6 +60,8 @@ int main(int argc, char *argv[]){
                                             std::make_unique<Literal>(45.76)
                                         )
     );*/ 
-    std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
+    //std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
+    //Expr* expression = new Unary(Token{MINUS, "-", "", 1}, new Literal(123.));
+    Expr* expression = new Literal(123.);
     std::cout << ASTprinter{}.print(expression);
 }

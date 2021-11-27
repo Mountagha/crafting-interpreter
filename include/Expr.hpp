@@ -63,11 +63,13 @@ class Literal: public Expr {
 
 class Unary: public Expr {
 	public:
-		Unary(Token operator_, std::unique_ptr<Expr>&& right) {
+		Unary(Token operator_, Expr* right) {
 			operator_ = operator_;
-			right = std::move (right);
+			right = right;
+			std::cerr << operator_;
 		}
 		std::any accept(Visitor& visitor) override {
+			std::cerr << "I'm here";
 			return visitor.visitUnaryExpr(*this);
 		}
 		Token operator_;
