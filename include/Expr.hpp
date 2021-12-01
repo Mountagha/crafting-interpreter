@@ -19,8 +19,8 @@ class Visitor {
 class Expr {
 
 	public:
-		//Expr() = default;
-		~Expr() {} 
+		Expr() = default;
+		~Expr() = default;
 		virtual std::any accept(Visitor& visitor) = 0;
 };
 
@@ -63,13 +63,11 @@ class Literal: public Expr {
 
 class Unary: public Expr {
 	public:
-		Unary(Token operator_, Expr* right) {
+		Unary(Token operator_, std::unique_ptr<Expr>&& right) {
 			operator_ = operator_;
-			right = right;
-			std::cerr << operator_;
+			right = std::move (right);
 		}
 		std::any accept(Visitor& visitor) override {
-			std::cerr << "I'm here";
 			return visitor.visitUnaryExpr(*this);
 		}
 		Token operator_;
