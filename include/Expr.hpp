@@ -20,16 +20,16 @@ class Expr {
 
 	public:
 		Expr() = default;
-		~Expr() = default;
+		virtual ~Expr() = default;
 		virtual std::any accept(Visitor& visitor) = 0;
 };
 
 class Binary: public Expr {
 	public:
-		Binary(std::unique_ptr<Expr>&& left, Token operator_, std::unique_ptr<Expr>&& right) {
-			left = std::move (left);
-			operator_ = operator_;
-			right = std::move (right);
+		Binary(std::unique_ptr<Expr>&& left_, Token operator__, std::unique_ptr<Expr>&& right_) {
+			left = std::move (left_);
+			operator_ = operator__;
+			right = std::move (right_);
 		}
 		std::any accept(Visitor& visitor) override {
 			return visitor.visitBinaryExpr(*this);
@@ -41,8 +41,8 @@ class Binary: public Expr {
 
 class Grouping: public Expr {
 	public:
-		Grouping(std::unique_ptr<Expr>&& expression) {
-			expression = std::move (expression);
+		Grouping(std::unique_ptr<Expr>&& expression_) {
+			expression = std::move (expression_);
 		}
 		std::any accept(Visitor& visitor) override {
 			return visitor.visitGroupingExpr(*this);
@@ -52,8 +52,8 @@ class Grouping: public Expr {
 
 class Literal: public Expr {
 	public:
-		Literal(std::any value) {
-			value = value;
+		Literal(std::any value_) {
+			value = value_;
 		}
 		std::any accept(Visitor& visitor) override {
 			return visitor.visitLiteralExpr(*this);
@@ -63,9 +63,9 @@ class Literal: public Expr {
 
 class Unary: public Expr {
 	public:
-		Unary(Token operator_, std::unique_ptr<Expr>&& right) {
-			operator_ = operator_;
-			right = std::move (right);
+		Unary(Token operator__, std::unique_ptr<Expr>&& right_) {
+			operator_ = operator__;
+			right = std::move (right_);
 		}
 		std::any accept(Visitor& visitor) override {
 			return visitor.visitUnaryExpr(*this);
