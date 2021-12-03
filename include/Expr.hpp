@@ -56,6 +56,7 @@ class Literal: public Expr {
 			value = value;
 		}
 		std::any accept(Visitor& visitor) override {
+			std::cout << std::any_cast<double>(value);
 			return visitor.visitLiteralExpr(*this);
 		}
 		std::any value;

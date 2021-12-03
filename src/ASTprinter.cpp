@@ -10,8 +10,8 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        std::string print(Expr* expr) {
-            return std::any_cast<std::string>(expr->accept(*this));
+        double print(Expr* expr) {
+            return std::any_cast<double>(expr->accept(*this));
         }
 
         std::any visitBinaryExpr(Binary& expr) override {
@@ -23,14 +23,22 @@ class ASTprinter: public Visitor {
         }
 
         std::any visitLiteralExpr(Literal& expr) override {
-            if ( expr.value.has_value() ) 
-                return std::any_cast<std::string>(expr.value);
-            else 
-                return std::any_cast<std::string>("nil");
+            if ( expr.value.has_value() ) {
+                auto& literal_type = expr.value.type();
+                if (literal_type == typeid(double) or literal_type == typeid(int))
+                    return std::any_cast<double>(expr.value);
+                else if (literal_type == typeid(std::string))
+                    return std::any_cast<std::string>(expr.value);
+                else if (literal_type == typeid(bool))
+                    return std::any_cast<bool>(expr.value) ? "true" : "false";
+                else 
+                    return "unrecognized literal type";
+            } else // not value 
+                return "nil";
         }
 
         std::any visitUnaryExpr(Unary& expr) override {
-            //return parenthesize(expr.operator_.lexeme, {expr.right});
+            return parenthesize(expr.operator_.lexeme, {expr.right});
         }
     private: 
         // template<class... E> 
@@ -62,6 +70,6 @@ int main(int argc, char *argv[]){
     );*/ 
     //std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
     //Expr* expression = new Unary(Token{MINUS, "-", "", 1}, new Literal(123.));
-    Expr* expression = new Literal(123.);
+    Expr* expression = new Literal(123.0);
     std::cout << ASTprinter{}.print(expression);
 }
