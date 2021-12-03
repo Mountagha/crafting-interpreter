@@ -10,8 +10,8 @@ using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
-        double print(Expr* expr) {
-            return std::any_cast<double>(expr->accept(*this));
+        std::string print(std::unique_ptr<Expr>& expr) {
+            return std::any_cast<std::string>(expr->accept(*this));
         }
 
         std::any visitBinaryExpr(Binary& expr) override {
@@ -38,10 +38,9 @@ class ASTprinter: public Visitor {
         }
 
         std::any visitUnaryExpr(Unary& expr) override {
-            return parenthesize(expr.operator_.lexeme, {expr.right});
+            return parenthesize(expr.operator_.lexeme, {expr.right.get()});
         }
     private: 
-        // template<class... E> 
         std::string parenthesize(std::string name, const std::vector<Expr*>& exprs){
             std::stringstream ss;
             ss << "(" + name;
@@ -68,8 +67,6 @@ int main(int argc, char *argv[]){
                                             std::make_unique<Literal>(45.76)
                                         )
     );*/ 
-    //std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
-    //Expr* expression = new Unary(Token{MINUS, "-", "", 1}, new Literal(123.));
-    Expr* expression = new Literal(123.0);
+    std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
     std::cout << ASTprinter{}.print(expression);
 }
