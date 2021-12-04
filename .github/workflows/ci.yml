@@ -19,6 +19,6 @@ jobs:
         cd build
         cmake ..
         make
-        ./interpreter ../samples/fibonacci.lox
+        ./interpreter
         cd ..
         rm -r build
