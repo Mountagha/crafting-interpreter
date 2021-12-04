@@ -26,7 +26,7 @@ class ASTprinter: public Visitor {
             if ( expr.value.has_value() ) {
                 auto& literal_type = expr.value.type();
                 if (literal_type == typeid(double) or literal_type == typeid(int))
-                    return std::any_cast<double>(expr.value);
+                    return std::to_string(std::any_cast<double>(expr.value));
                 else if (literal_type == typeid(std::string))
                     return std::any_cast<std::string>(expr.value);
                 else if (literal_type == typeid(bool))
@@ -48,6 +48,7 @@ class ASTprinter: public Visitor {
                 ss << " ";
                 ss << std::any_cast<std::string>(expr->accept(*this));
             }
+            ss << ")";
             return std::any_cast<std::string>(ss.str());
         }
 };
@@ -60,13 +61,14 @@ int main(int argc, char *argv[]){
     /*std::unique_ptr<Expr> expression = std::make_unique<Binary>(
                                         std::make_unique<Unary>(
                                         Token{MINUS, "-", "", 1},
-                                        std::make_unique<Literal>(123.)
+                                        std::make_unique<Literal>(123)
                                         ),
                                         Token{STAR, "*", "", 1},
                                         std::make_unique<Grouping>(
                                             std::make_unique<Literal>(45.76)
                                         )
     );*/ 
-    std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(123.));
-    std::cout << ASTprinter{}.print(expression);
+    std::unique_ptr<Expr> expression = std::make_unique<Unary>(Token{MINUS, "-", "", 1}, std::make_unique<Literal>(std::string("123.")));
+    //std::unique_ptr<Expr> expression = std::make_unique<Literal>(12.3);
+    std::cout << ASTprinter{}.print(expression) << '\n';
 }
