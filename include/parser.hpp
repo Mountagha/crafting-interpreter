@@ -1,21 +1,27 @@
 #pragma once
 
-#include "Expr.hpp"
-#include "token.hpp"
 #include <vector>
 #include <memory>
+#include <exception>
+#include "Expr.hpp"
+#include "token.hpp"
+#include "lox.hpp"
 
 
 namespace lox {
 using namespace lox::AST;
+using PExpr = std::unique_ptr<Expr>; 
 
 class Parser {
     public:
-        Parser(std::vector<Token>& tokens_ ): tokens{tokens_}, current{0} {}
+        Parser(std::vector<Token>& tokens_ );
+        PExpr parse();
+
 
     private:
 
-        using PExpr = std::unique_ptr<Expr>; 
+        struct ParseError : std::runtime_error { using std::runtime_error::runtime_error; }; // constructor inheritance
+
         std::vector<Token> tokens;
         unsigned int current;
 
@@ -129,6 +135,43 @@ class Parser {
                 consume(RIGHT_PARENT, "Expect ')' after expression.");
                 return std::make_unique<Grouping>(expr);
             }
+
+            throw error(peek(), "Expect expression.");
+        }
+
+        Token consume(TokenType token_type, std::string message) {
+            if (check(token_type)) return advance();
+
+            throw error(peek(), message);
+        }
+
+        ParseError error(Token token, std::string message) {
+            Lox::error(token, message);
+
+            return ParseError{message};
+        }
+
+        void synchronize() {
+            advance();
+
+            while (!isAtEnd()) {
+                if (previous().token_type == SEMICOLON) return;
+
+                switch (peek().token_type) {
+                    case CLASS:
+                    case FUN:
+                    case VAR:
+                    case FOR:
+                    case IF:
+                    case WHILE:
+                    case PRINT:
+                    case RETURN:
+                        return;
+                }
+
+                advance();
+            }
+            
         }
 };
 
