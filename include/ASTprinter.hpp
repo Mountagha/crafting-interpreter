@@ -1,12 +1,12 @@
+#pragma once
+
 #include <iostream>
-#include "../include/Expr.hpp"
-#include <vector>
 #include <sstream>
-// #include "../include/token.hpp"
+#include <vector>
+#include "Expr.hpp"
 
 
 namespace lox {
-using namespace AST;
 
 class ASTprinter: public Visitor {
     public:
@@ -56,6 +56,8 @@ class ASTprinter: public Visitor {
 };
 
 } // namespace lox
+/*
+this was just for testing.
 
 using namespace lox;
 
@@ -72,3 +74,5 @@ int main(int argc, char *argv[]){
     ); 
     std::cout << ASTprinter{}.print(expression) << '\n';
 }
+
+*/

@@ -112,7 +112,7 @@ void defineAST(
     }
     out << "#include \"token.hpp\"\n";
     out << "#include <memory>\n\n";
-    out << "namespace lox { namespace AST { \n\n";
+    out << "namespace lox { \n\n";
     // declare classes
     declare_classes(out, map);
     // Define visitor class 
@@ -132,7 +132,7 @@ void defineAST(
         define_type(out, basename, classname, fields);
     }
     
-    out << "} // AST namespace\n";
+    //out << "} // AST namespace\n";
     out << "} // lox namespace";
 
 }

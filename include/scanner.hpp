@@ -2,7 +2,6 @@
 
 #include "token.hpp"
 #include "lox.hpp"
-#include "literal.hpp"
 #include <vector>
 #include <map>
 #include <stack>

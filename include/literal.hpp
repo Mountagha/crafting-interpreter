@@ -1,4 +1,5 @@
 #pragma once
+/*
 
 namespace lox {
 // to use later for literal type maybe
@@ -13,3 +14,5 @@ class Literal {
 };
 
 } 
+
+*/

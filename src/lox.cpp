@@ -1,8 +1,11 @@
 #include <iostream> // for debugging
 #include <fstream>
 #include <sstream>
+#include <memory>
 #include "scanner.hpp"
 #include "lox.hpp"
+#include "parser.hpp"
+#include "ASTprinter.hpp"
 
 namespace lox
 {
@@ -27,11 +30,14 @@ namespace lox
         Scanner scanner(source);
         std::vector<Token> tokens = scanner.scanTokens();
 
-        // for now we just print the tokens. maybe use references later
         for (Token token : tokens)
         {
             std::cout << token << std::endl;
         }
+        Parser parser{tokens};
+        std::unique_ptr<Expr> expression = parser.parse();
+        std::cout << ASTprinter{}.print(expression) << '\n';
+
     }
     void Lox::runFile(std::string path)
     {

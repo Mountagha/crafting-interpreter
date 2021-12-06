@@ -1,7 +1,9 @@
+#pragma once
+
 #include "token.hpp"
 #include <memory>
 
-namespace lox { namespace AST { 
+namespace lox { // namespace AST { 
 
 class Binary;
 class Grouping;
@@ -74,5 +76,5 @@ class Unary: public Expr {
 		std::unique_ptr<Expr> right;
 };
 
-} // AST namespace
+// }  AST namespace
 } // lox namespace

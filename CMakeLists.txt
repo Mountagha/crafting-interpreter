@@ -11,7 +11,7 @@ project (crafting-interpreters)
 add_compile_options(-g)
 
 include_directories("include")
-file(GLOB SOURCES "src/ASTprinter.cpp" , "src/token.cpp")
+file(GLOB SOURCES "src/*.cpp")
 
 # Add an executable
 add_executable(interpreter ${SOURCES})

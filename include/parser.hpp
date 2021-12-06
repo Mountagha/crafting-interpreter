@@ -9,17 +9,14 @@
 
 
 namespace lox {
-using namespace lox::AST;
-using PExpr = std::unique_ptr<Expr>; 
 
 class Parser {
     public:
         Parser(std::vector<Token>& tokens_ );
-        PExpr parse();
-
+        std::unique_ptr<Expr> parse();
 
     private:
-
+        using PExpr = std::unique_ptr<Expr>; 
         struct ParseError : std::runtime_error { using std::runtime_error::runtime_error; }; // constructor inheritance
 
         std::vector<Token> tokens;
@@ -123,7 +120,7 @@ class Parser {
         PExpr primary() {
             if (match({FALSE})) return std::make_unique<Literal>(false);
             if (match({TRUE})) return std::make_unique<Literal>(true);
-            if (match({NIL})) return std::make_unique<Literal>();
+            if (match({NIL})) return std::make_unique<Literal>(nullptr);
             
         
 
