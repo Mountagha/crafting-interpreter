@@ -110,8 +110,8 @@ class Parser {
         PExpr unary() {
             if (match ({BANG, MINUS})) {
                 Token operator_ = previous();
-                PExpr right = unary();
-                return std::make_unique<Unary>(operator_, right);
+                //PExpr right = unary();
+                return std::make_unique<Unary>(operator_, unary());
             }
 
             return primary();
@@ -128,9 +128,9 @@ class Parser {
                 return std::make_unique<Literal>(previous().literal);
             
             if (match({LEFT_PAREN})) {
-                PExpr expr = expression();
+                //PExpr expr = expression();
                 consume(RIGHT_PARENT, "Expect ')' after expression.");
-                return std::make_unique<Grouping>(expr);
+                return std::make_unique<Grouping>(expression());
             }
 
             throw error(peek(), "Expect expression.");

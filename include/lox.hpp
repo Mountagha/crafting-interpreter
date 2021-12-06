@@ -1,5 +1,7 @@
 #pragma once
 
+#include "token.hpp"
+
 namespace lox {
 
 class Lox {

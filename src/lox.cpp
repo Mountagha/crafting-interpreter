@@ -25,6 +25,13 @@ namespace lox
         report(line, "", message);
     }
 
+    void Lox::error(Token token, std::string message) {
+        if (token.token_type == EOF)
+            report(token.line, " at end", message);
+        else 
+            report (token.line, " at '" + token.lexeme + "'", message);
+    }
+
     void Lox::run(const std::string &source)
     {
         Scanner scanner(source);
