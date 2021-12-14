@@ -32,11 +32,11 @@ class ASTprinter: public Visitor {
                 else if (literal_type == typeid(std::string))
                     return std::any_cast<std::string>(expr.value);
                 else if (literal_type == typeid(bool))
-                    return std::any_cast<bool>(expr.value) ? "true" : "false";
+                    return std::any_cast<bool>(expr.value) ? std::string("true") : std::string("false");
                 else 
-                    return "unrecognized literal type";
+                    return std::string("unrecognized literal type");
             } else // not value 
-                return "nil";
+                return std::string("nil");
         }
 
         std::any visitUnaryExpr(Unary& expr) override {

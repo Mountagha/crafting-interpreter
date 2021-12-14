@@ -43,6 +43,10 @@ namespace lox
         }
         Parser parser{tokens};
         std::unique_ptr<Expr> expression = parser.parse();
+
+        // Stop if there was a syntax error.
+        if (hadError) return;
+
         std::cout << ASTprinter{}.print(expression) << '\n';
 
     }
@@ -70,6 +74,8 @@ namespace lox
                 break;
             //std::erase(std::find(line.begin(), line.end(), '\0'));
             run(line);
+            // reset-had-error
+            hadError = false;
         }
     }
 
