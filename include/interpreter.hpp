@@ -17,6 +17,19 @@ class Interpreter : public Visitor {
             return expr->accept(*this);
         }
 
+        bool isTruthy(std::any& object) {
+            if (!(object.has_value())) return false;
+            if (object.type() == typeid(bool)) return std::any_cast<bool>(object);
+            return true;
+        }
+
+        bool isEqual(std::any& object_a, std::any& object_b) {
+            if (!object_a.has_value() && !object_b.has_value()) return true;
+            if (!object_a.has_value()) return false;
+            return true; 
+        }
+
+
 };
 
 }
