@@ -29,6 +29,12 @@ class LoxObject {
         LoxObject& operator=(const LoxObject& );
         ~LoxObject();
 
+
+        friend bool operator==(const LoxObject& a, const LoxObject& b);
+        friend bool operator<(const LoxObject& a, const LoxObject& b);
+        friend LoxObject operator-(LoxObject a);
+        friend LoxObject operator!(LoxObject a);
+
         LoxObject& operator+=(const LoxObject& o);
         LoxObject& operator-=(const LoxObject& o);
         LoxObject& operator*=(const LoxObject& o);
@@ -48,13 +54,22 @@ class LoxObject {
         bool boolean = false;
         std::string string = "";
 
+        void cast(LoxType t) {
+            if (t == lox_type) return;
+            // handle other types later
+            switch(t) {
+                case LoxType::Nil: break;
+                case LoxType::Bool: boolean = (bool)(*this); break;
+                case LoxType::Number: number = (double)(*this); break;
+                case LoxType::String: string = (std::string)(*this); break;
+                // handle other types later
+            }
+
+            lox_type = t;
+        }
+
 };
 
-LoxObject operator-(LoxObject a);
-LoxObject operator!(LoxObject a);
-
-bool operator==(const LoxObject& a, const LoxObject& b);
-bool operator<(const LoxObject& a, const LoxObject& b);
 
 inline bool operator!=(const LoxObject& a, const LoxObject& b){
     return !(a == b);
