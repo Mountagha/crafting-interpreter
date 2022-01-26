@@ -1,9 +1,10 @@
 #pragma once
 
 #include "token.hpp"
+#include "loxObject.hpp"
 #include <memory>
 
-namespace lox { // namespace AST { 
+namespace lox { 
 
 class Binary;
 class Grouping;
@@ -12,18 +13,18 @@ class Unary;
 
 class Visitor {
 	public:
-		virtual std::any visitBinaryExpr( Binary& expr) = 0;
-		virtual std::any visitGroupingExpr( Grouping& expr) = 0;
-		virtual std::any visitLiteralExpr( Literal& expr) = 0;
-		virtual std::any visitUnaryExpr( Unary& expr) = 0;
+		virtual LoxObject visitBinaryExpr( Binary& expr) = 0;
+		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
+		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
+		virtual LoxObject visitUnaryExpr( Unary& expr) = 0;
 };
 
 class Expr {
 
 	public:
 		Expr() = default;
-		virtual ~Expr() = default;
-		virtual std::any accept(Visitor& visitor) = 0;
+		~Expr() = default;
+		virtual LoxObject accept(Visitor& visitor) = 0;
 };
 
 class Binary: public Expr {
@@ -33,7 +34,7 @@ class Binary: public Expr {
 			operator_ = operator__;
 			right = std::move (right_);
 		}
-		std::any accept(Visitor& visitor) override {
+		LoxObject accept(Visitor& visitor) override {
 			return visitor.visitBinaryExpr(*this);
 		}
 		std::unique_ptr<Expr> left;
@@ -46,7 +47,7 @@ class Grouping: public Expr {
 		Grouping(std::unique_ptr<Expr>&& expression_) {
 			expression = std::move (expression_);
 		}
-		std::any accept(Visitor& visitor) override {
+		LoxObject accept(Visitor& visitor) override {
 			return visitor.visitGroupingExpr(*this);
 		}
 		std::unique_ptr<Expr> expression;
@@ -54,13 +55,13 @@ class Grouping: public Expr {
 
 class Literal: public Expr {
 	public:
-		Literal(std::any value_) {
+		Literal(LoxObject value_) {
 			value = value_;
 		}
-		std::any accept(Visitor& visitor) override {
+		LoxObject accept(Visitor& visitor) override {
 			return visitor.visitLiteralExpr(*this);
 		}
-		std::any value;
+		LoxObject value;
 };
 
 class Unary: public Expr {
@@ -69,12 +70,11 @@ class Unary: public Expr {
 			operator_ = operator__;
 			right = std::move (right_);
 		}
-		std::any accept(Visitor& visitor) override {
+		LoxObject accept(Visitor& visitor) override {
 			return visitor.visitUnaryExpr(*this);
 		}
 		Token operator_;
 		std::unique_ptr<Expr> right;
 };
 
-// }  AST namespace
 } // lox namespace

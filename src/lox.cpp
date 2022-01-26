@@ -47,7 +47,7 @@ namespace lox
         // Stop if there was a syntax error.
         if (hadError) return;
 
-        std::cout << ASTprinter{}.print(expression) << '\n';
+        ASTprinter{}.print(expression);
 
     }
     void Lox::runFile(std::string path)

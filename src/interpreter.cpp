@@ -1,5 +1,5 @@
 #include "interpreter.hpp"
-
+/*
 namespace lox {
 
 std::any Interpreter::visitLiteralExpr(Literal& expr) {
@@ -59,10 +59,5 @@ std::any Interpreter::visitBinaryExpr(Binary& expr) {
     return nullptr;
 }
 
-
-
-
-
-
-
 }
+*/

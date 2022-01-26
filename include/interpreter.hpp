@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Expr.hpp"
-
+/*
 namespace lox {
 
 class Interpreter : public Visitor {
@@ -33,3 +33,4 @@ class Interpreter : public Visitor {
 };
 
 }
+*/

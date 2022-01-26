@@ -42,7 +42,7 @@ void defineVisitor(std::ostream& out, std::string basename, const std::map<std::
     //auto lower_basename = [&basename]() { std::for_each(basename.begin(), basename.end(), ::tolower); };
     for (const auto& e: map){
         std::string type_name = e.first;
-        out << "\t\tvirtual std::any visit" + type_name + basename + "( ";  
+        out << "\t\tvirtual LoxObject visit" + type_name + basename + "( ";  
         out <<  type_name + "& " + basename_lower + ") = 0;\n";  
     }
     out << "};\n\n";
@@ -82,7 +82,7 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     
     out << "\t\t}\n";
     // Visitor pattern
-    out << "\t\tstd::any accept(Visitor& visitor) override {\n";
+    out << "\t\tLoxObject accept(Visitor& visitor) override {\n";
     out << "\t\t\treturn visitor.visit" + classname + basename + "(*this);\n";
     out << "\t\t}\n";
     // fields
@@ -110,7 +110,9 @@ void defineAST(
         std::cerr << "Unable to open the file for writing";
         std::exit(65);
     }
+    out << "#pragma once\n\n";
     out << "#include \"token.hpp\"\n";
+    out << "#include \"loxObject.hpp\"\n";
     out << "#include <memory>\n\n";
     out << "namespace lox { \n\n";
     // declare classes
@@ -123,7 +125,7 @@ void defineAST(
     out << "\tpublic:\n";
     out << "\t\t" + basename + "() = default;\n";
     out << "\t\t~" + basename + "() = default;\n";
-    out << "\t\tvirtual std::any accept(Visitor& visitor) = 0;\n";
+    out << "\t\tvirtual LoxObject accept(Visitor& visitor) = 0;\n";
     out << "};\n\n";
 
     for (auto& e: map) {
@@ -147,7 +149,7 @@ int main(int argc, char *argv[]) {
     std::map<std::string, std::string> map {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
         {"Grouping", "Expr* expression"},
-        {"Literal", "std::any value"},
+        {"Literal", "LoxObject value"},
         {"Unary", "Token operator_, Expr* right"} 
     };
 

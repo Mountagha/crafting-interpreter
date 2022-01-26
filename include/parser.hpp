@@ -125,7 +125,7 @@ class Parser {
         
 
             if (match({NUMBER, STRING})) 
-                return std::make_unique<Literal>(previous().literal);
+                return std::make_unique<Literal>(LoxObject(previous()));
             
             if (match({LEFT_PAREN})) {
                 PExpr expr = expression();
