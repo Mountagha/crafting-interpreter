@@ -1,63 +1,56 @@
 #include "interpreter.hpp"
-/*
+
 namespace lox {
 
-std::any Interpreter::visitLiteralExpr(Literal& expr) {
+LoxObject Interpreter::visitLiteralExpr(Literal& expr) {
     return expr.value;
 }
 
-std::any Interpreter::visitGroupingExpr(Grouping& expr) {
+LoxObject Interpreter::visitGroupingExpr(Grouping& expr) {
     return evaluate(expr.expression);
 }
 
-std::any Interpreter::visitUnaryExpr(Unary& expr) {
-    std::any right = evaluate(expr.right);
+LoxObject Interpreter::visitUnaryExpr(Unary& expr) {
+    LoxObject right = evaluate(expr.right);
 
     switch(expr.operator_.token_type) {
         case TokenType::BANG:
-            return !isTruthy(right);
+            return !right;
         case TokenType::MINUS:
-            return std::any_cast<double>(right);
+            return -right;
+        default:
+            std::runtime_error("Invalid unary expression.");
     }
 
-    // Unreachable 
-    return nullptr;
 }
 
-std::any Interpreter::visitBinaryExpr(Binary& expr) {
-    std::any left = evaluate(expr.left);
-    std::any right = evaluate(expr.right);
+LoxObject Interpreter::visitBinaryExpr(Binary& expr) {
+    LoxObject left = evaluate(expr.left);
+    LoxObject right = evaluate(expr.right);
 
     switch(expr.operator_.token_type) {
         case TokenType::GREATER:
-            return std::any_cast<double>(left) > std::any_cast<double>(right);
+            return LoxObject(left > right);
         case TokenType::GREATER_EQUAL:
-            return std::any_cast<double>(left) >= std::any_cast<double>(right);
+            return LoxObject(left >= right); 
         case TokenType::LESS:
-            return std::any_cast<double>(left) < std::any_cast<double>(right);
+            return LoxObject(left < right); 
         case TokenType::LESS_EQUAL:
-            return std::any_cast<double>(left) <= std::any_cast<double>(right);
+            return LoxObject(left <= right); 
         case TokenType::MINUS:
-            return std::any_cast<double>(left) - std::any_cast<double>(right);
+            return left - right;
         case TokenType::PLUS:
-            if (left.type() == typeid(double) && right.type() == typeid(double)) {
-                return std::any_cast<double>(left) + std::any_cast<double>(right);
-            }
-            if (left.type() == typeid(std::string) && right.type() == typeid(std::string)) {
-                return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
-            }
-        break;
+            return left + right;
         case TokenType::SLASH:
-            return std::any_cast<double>(left) / std::any_cast<double>(right);
+            return left / right; 
         case TokenType::STAR:
-            return std::any_cast<double>(left) * std::any_cast<double>(right);
-        case TokenType::BANG_EQUAL return (!isEqual(left, right));
-        case TokenType::EQUAL_EQUAL return isEqual(left, right);
+            return left * right; 
+        case TokenType::BANG_EQUAL: return LoxObject(left != right);
+        case TokenType::EQUAL_EQUAL: return LoxObject(left == right);
+        default:
+            std::runtime_error("unknown binary expression");
     }
 
-    // unreachable 
-    return nullptr;
 }
 
 }
-*/
