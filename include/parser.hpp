@@ -118,9 +118,9 @@ class Parser {
         }
 
         PExpr primary() {
-            if (match({FALSE})) return std::make_unique<Literal>(false);
-            if (match({TRUE})) return std::make_unique<Literal>(true);
-            if (match({NIL})) return std::make_unique<Literal>(nullptr);
+            if (match({FALSE})) return std::make_unique<Literal>(LoxObject(false));
+            if (match({TRUE})) return std::make_unique<Literal>(LoxObject(true));
+            if (match({NIL})) return std::make_unique<Literal>(LoxObject());
             
         
 
