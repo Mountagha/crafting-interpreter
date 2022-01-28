@@ -290,5 +290,22 @@ LoxObject operator!(LoxObject a) {
     a.lox_type = LoxType::Bool;
     return a; 
 }
+std::ostream& operator<<(std::ostream& os, const LoxObject& o) {
+    switch (o.lox_type) {
+        case LoxType::Nil:
+            os << "nil";
+            break;
+        case LoxType::Bool:
+            os << (o.boolean ? "true" : "false");
+            break;
+        case LoxType::Number:
+            os << o.number;
+            break;
+        case LoxType::String:
+            os << o.string;
+            break;
+    } 
+    return os;
+}
 
 } // namespace lox

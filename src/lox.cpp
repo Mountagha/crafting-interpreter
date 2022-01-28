@@ -6,11 +6,13 @@
 #include "lox.hpp"
 #include "parser.hpp"
 #include "ASTprinter.hpp"
+#include "interpreter.hpp"
 
 namespace lox
 {
 
     bool Lox::hadError{false};
+    bool lox::hadRuntimeError{false};
 
     void Lox::report(int line, std::string where, std::string message)
     {
@@ -32,6 +34,10 @@ namespace lox
             report (token.line, " at '" + token.lexeme + "'", message);
     }
 
+    void Lox::runtimeError(){
+        hadRuntimeError = true;
+    }    
+
     void Lox::run(const std::string &source)
     {
         Scanner scanner(source);
@@ -47,7 +53,12 @@ namespace lox
         // Stop if there was a syntax error.
         if (hadError) return;
 
-        ASTprinter{}.print(expression);
+        //ASTprinter{}.print(expression);
+
+        Interpreter{}.interpret(expression);
+         
+
+        
 
     }
     void Lox::runFile(std::string path)
@@ -62,6 +73,12 @@ namespace lox
         sstr << in.rdbuf();
         std::string content = sstr.str();
         run(content);
+
+        // exit if there's an syntax error
+        if (hadError) exit(65);
+
+        // exit if there's a runtime error
+        if (hadRuntimeError) exit(70);
     }
 
     void Lox::runPrompt()

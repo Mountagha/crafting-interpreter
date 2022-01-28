@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <string>
+#include <ostream>
 #include "token.hpp"
 
 namespace lox {
@@ -32,6 +33,7 @@ class LoxObject {
 
         friend bool operator==(const LoxObject& a, const LoxObject& b);
         friend bool operator<(const LoxObject& a, const LoxObject& b);
+        friend std::ostream& operator<<(std::ostream& os, const LoxObject& o);
         friend LoxObject operator-(LoxObject a);
         friend LoxObject operator!(LoxObject a);
 
