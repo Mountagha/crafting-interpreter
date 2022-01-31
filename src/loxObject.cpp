@@ -239,6 +239,8 @@ LoxObject& LoxObject::operator/=(const LoxObject& o) {
             case LoxType::Bool:
                 throw std::runtime_error("Cannot divide bools.");
             case LoxType::Number:
+                if (o.number == 0.) 
+                    throw std::runtime_error("Attempted a division by Zero\n");
                 number /= o.number;
                 break;
             case LoxType::String:

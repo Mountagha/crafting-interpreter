@@ -12,7 +12,7 @@ namespace lox
 {
 
     bool Lox::hadError{false};
-    bool lox::hadRuntimeError{false};
+    bool Lox::hadRuntimeError{false};
 
     void Lox::report(int line, std::string where, std::string message)
     {
@@ -54,12 +54,9 @@ namespace lox
         if (hadError) return;
 
         //ASTprinter{}.print(expression);
-
-        Interpreter{}.interpret(expression);
+        // should be declared static to persist data accross different executions.
+        Interpreter{}.interpret(std::move(expression));
          
-
-        
-
     }
     void Lox::runFile(std::string path)
     {
