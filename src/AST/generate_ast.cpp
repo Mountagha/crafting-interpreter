@@ -101,7 +101,8 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
 void defineAST(
         std::string output_dir, 
         std::string basename,
-        std::map<std::string,std::string> map
+        std::map<std::string,std::string> map,
+        std::vector<std::string>& includes 
     ) { 
 
     std::string path = output_dir + "/" + basename + ".hpp";
@@ -111,10 +112,9 @@ void defineAST(
         std::exit(65);
     }
     out << "#pragma once\n\n";
-    out << "#include \"token.hpp\"\n";
-    out << "#include \"loxObject.hpp\"\n";
-    out << "#include <memory>\n\n";
-    out << "namespace lox { \n\n";
+    for (const auto& include_ : includes) 
+        out << "#include " << include_ << '\n'; 
+    out << "\nnamespace lox { \n\n";
     // declare classes
     declare_classes(out, map);
     // Define visitor class 
@@ -146,13 +146,23 @@ int main(int argc, char *argv[]) {
         std::exit(64);
     }
     std::string output_dir = argv[1];
-    std::map<std::string, std::string> map {
+    std::map<std::string, std::string> expr_map {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
         {"Grouping", "Expr* expression"},
         {"Literal", "LoxObject value"},
         {"Unary", "Token operator_, Expr* right"} 
     };
 
-    defineAST(output_dir, "Expr", map);
+    std::vector<std::string> includes {"\"token.hpp\"", "\"loxObject.hpp\"", "<memory>"};
+    defineAST(output_dir, "Expr", expr_map, includes);
+
+    std::map<std::string, std::string> stmt_map {
+        {"Expression", "Expr* expression"},
+        {"Print", "Expr* expression"}
+    };
+
+    includes.push_back("\"Expr.hpp\"");
+
+    defineAST (output_dir, "Stmt", stmt_map, includes);
     return 0;
 }

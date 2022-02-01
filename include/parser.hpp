@@ -6,6 +6,7 @@
 #include "Expr.hpp"
 #include "token.hpp"
 #include "lox.hpp"
+#include "Stmt.hpp"
 
 
 namespace lox {
@@ -13,10 +14,11 @@ namespace lox {
 class Parser {
     public:
         Parser(std::vector<Token>& tokens_ );
-        std::unique_ptr<Expr> parse();
+        std::vector<std::unique_ptr<Stmt>> parse();
 
     private:
         using PExpr = std::unique_ptr<Expr>; 
+        using SExpr = std::unique_ptr<Stmt>;
         struct ParseError : std::runtime_error { using std::runtime_error::runtime_error; }; // constructor inheritance
 
         std::vector<Token> tokens;
@@ -24,6 +26,24 @@ class Parser {
 
         PExpr expression() {
             return equality();
+        }
+
+        SExpr statement() {
+            if (match ({PRINT})) return printStatement();
+
+            return expressionStatement();
+        }        
+
+        SExpr printStatement() {
+            PExpr value = expression();
+            consume(SEMICOLON, "Expect ';' after value.");
+            return std::make_unique<Print>(std::move(value));
+        }
+
+        SExpr expressionStatement() {
+            PExpr expr = expression();
+            consume(SEMICOLON, "Expect ';' after expression.");
+            return std::make_unique<Expression>(std::move(expr));
         }
 
         PExpr equality() {
