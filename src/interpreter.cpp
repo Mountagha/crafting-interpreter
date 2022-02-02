@@ -60,10 +60,10 @@ void Interpreter::visitExpressionStmt(Expression& stmt) {
 
 void Interpreter::visitPrintStmt(Print& stmt) {
     LoxObject value = evaluate(stmt.expression);
-    std::cout << value;
+    std::cout << value << '\n';
 }
 
-void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>> statements) {
+void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements) {
     try
     {
         for (auto& stmt : statements) {

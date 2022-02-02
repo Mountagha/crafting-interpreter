@@ -21,7 +21,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void visitExpressionStmt(Expression& stmt) override;
         void visitPrintStmt(Print& stmt) override;
 
-        void interpret(std::vector<std::unique_ptr<Stmt>> statements);
+        void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
     
     private:
         LoxObject evaluate(std::unique_ptr<Expr>& expr) {

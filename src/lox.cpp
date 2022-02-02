@@ -54,6 +54,7 @@ namespace lox
         if (hadError) return;
 
         //ASTprinter{}.print(expression);
+
         // should be declared static to persist data accross different executions.
         Interpreter{}.interpret(statements);
          

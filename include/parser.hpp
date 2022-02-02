@@ -80,7 +80,7 @@ class Parser {
         }
 
         bool isAtEnd() {
-            return peek().token_type == EOF;
+            return peek().token_type == EOFILE;
         }
 
         Token peek() {
