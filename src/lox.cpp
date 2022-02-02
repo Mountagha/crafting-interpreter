@@ -48,14 +48,14 @@ namespace lox
             std::cout << token << std::endl;
         }
         Parser parser{tokens};
-        std::unique_ptr<Expr> expression = parser.parse();
+        std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (hadError) return;
 
         //ASTprinter{}.print(expression);
         // should be declared static to persist data accross different executions.
-        Interpreter{}.interpret(std::move(expression));
+        Interpreter{}.interpret(statements);
          
     }
     void Lox::runFile(std::string path)

@@ -33,24 +33,32 @@ std::vector<std::string> split(std::string s, std::string sep) {
     return splits;
 }
 
-void defineVisitor(std::ostream& out, std::string basename, const std::map<std::string, std::string>& map) {
-    // out << "template <typename T>\n";
-    out << "class Visitor {\n";
+void defineVisitor(std::ostream& out, 
+                std::string basename, 
+                const std::map<std::string, 
+                std::string>& map,
+                std::string return_type) {
+
+    out << "class " << basename << "Visitor {\n";
     out << "\tpublic:\n";
     std::string basename_lower = basename;
     std::for_each(basename_lower.begin(), basename_lower.end(), [](char &c ) { c = ::tolower(c); });
     //auto lower_basename = [&basename]() { std::for_each(basename.begin(), basename.end(), ::tolower); };
     for (const auto& e: map){
         std::string type_name = e.first;
-        out << "\t\tvirtual LoxObject visit" + type_name + basename + "( ";  
+        out << "\t\tvirtual " << return_type << " visit" + type_name + basename + "( ";  
         out <<  type_name + "& " + basename_lower + ") = 0;\n";  
     }
     out << "};\n\n";
 
 }
 
-void define_type(std::ofstream& out, std::string basename, std::string classname, std::vector<std::string> fieldList) {
-    //out << "template<typename T>\n";
+void define_type(std::ofstream& out, 
+                std::string basename, 
+                std::string classname, 
+                std::vector<std::string> fieldList,
+                std::string return_type) {
+
     out << "class " + classname + ": public " + basename + " {\n";
     out << "\tpublic:\n";
     // Constructor
@@ -82,8 +90,8 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     
     out << "\t\t}\n";
     // Visitor pattern
-    out << "\t\tLoxObject accept(Visitor& visitor) override {\n";
-    out << "\t\t\treturn visitor.visit" + classname + basename + "(*this);\n";
+    out << "\t\t" << return_type << " accept(" << basename << "Visitor& visitor) override {\n";
+    out << "\t\t\t" << (return_type == "void" ? "" : "return ") << "visitor.visit" + classname + basename + "(*this);\n";
     out << "\t\t}\n";
     // fields
     //out << "\tprivate:\n";
@@ -102,7 +110,8 @@ void defineAST(
         std::string output_dir, 
         std::string basename,
         std::map<std::string,std::string> map,
-        std::vector<std::string>& includes 
+        std::vector<std::string>& includes,
+        std::string return_type
     ) { 
 
     std::string path = output_dir + "/" + basename + ".hpp";
@@ -118,20 +127,19 @@ void defineAST(
     // declare classes
     declare_classes(out, map);
     // Define visitor class 
-    defineVisitor(out, basename, map);
+    defineVisitor(out, basename, map, return_type);
     // define base class
-    // out << "template<typename T>\n";
     out << "class " + basename + " {\n\n";
     out << "\tpublic:\n";
     out << "\t\t" + basename + "() = default;\n";
     out << "\t\t~" + basename + "() = default;\n";
-    out << "\t\tvirtual LoxObject accept(Visitor& visitor) = 0;\n";
+    out << "\t\tvirtual " << return_type << " accept(" << basename << "Visitor& visitor) = 0;\n";
     out << "};\n\n";
 
     for (auto& e: map) {
         std::string classname = e.first;
         std::vector<std::string> fields = split(e.second, ", ");
-        define_type(out, basename, classname, fields);
+        define_type(out, basename, classname, fields, return_type);
     }
     
     //out << "} // AST namespace\n";
@@ -154,7 +162,7 @@ int main(int argc, char *argv[]) {
     };
 
     std::vector<std::string> includes {"\"token.hpp\"", "\"loxObject.hpp\"", "<memory>"};
-    defineAST(output_dir, "Expr", expr_map, includes);
+    defineAST(output_dir, "Expr", expr_map, includes, "LoxObject");
 
     std::map<std::string, std::string> stmt_map {
         {"Expression", "Expr* expression"},
@@ -163,6 +171,6 @@ int main(int argc, char *argv[]) {
 
     includes.push_back("\"Expr.hpp\"");
 
-    defineAST (output_dir, "Stmt", stmt_map, includes);
+    defineAST (output_dir, "Stmt", stmt_map, includes, "void");
     return 0;
 }

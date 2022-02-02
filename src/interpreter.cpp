@@ -53,11 +53,22 @@ LoxObject Interpreter::visitBinaryExpr(Binary& expr) {
 
 }
 
-void Interpreter::interpret(std::unique_ptr<Expr> expr) {
+// Stmt
+void Interpreter::visitExpressionStmt(Expression& stmt) {
+    evaluate(stmt.expression);
+}
+
+void Interpreter::visitPrintStmt(Print& stmt) {
+    LoxObject value = evaluate(stmt.expression);
+    std::cout << value;
+}
+
+void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>> statements) {
     try
     {
-        LoxObject value = evaluate(expr);
-        std::cout << value << '\n';
+        for (auto& stmt : statements) {
+            execute(stmt);
+        }
     }
     catch(const std::runtime_error& e)
     {

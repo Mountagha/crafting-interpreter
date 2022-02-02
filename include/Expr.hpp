@@ -11,7 +11,7 @@ class Grouping;
 class Literal;
 class Unary;
 
-class Visitor {
+class ExprVisitor {
 	public:
 		virtual LoxObject visitBinaryExpr( Binary& expr) = 0;
 		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
@@ -24,7 +24,7 @@ class Expr {
 	public:
 		Expr() = default;
 		~Expr() = default;
-		virtual LoxObject accept(Visitor& visitor) = 0;
+		virtual LoxObject accept(ExprVisitor& visitor) = 0;
 };
 
 class Binary: public Expr {
@@ -34,7 +34,7 @@ class Binary: public Expr {
 			operator_ = operator__;
 			right = std::move (right_);
 		}
-		LoxObject accept(Visitor& visitor) override {
+		LoxObject accept(ExprVisitor& visitor) override {
 			return visitor.visitBinaryExpr(*this);
 		}
 		std::unique_ptr<Expr> left;
@@ -47,7 +47,7 @@ class Grouping: public Expr {
 		Grouping(std::unique_ptr<Expr>&& expression_) {
 			expression = std::move (expression_);
 		}
-		LoxObject accept(Visitor& visitor) override {
+		LoxObject accept(ExprVisitor& visitor) override {
 			return visitor.visitGroupingExpr(*this);
 		}
 		std::unique_ptr<Expr> expression;
@@ -58,7 +58,7 @@ class Literal: public Expr {
 		Literal(LoxObject value_) {
 			value = value_;
 		}
-		LoxObject accept(Visitor& visitor) override {
+		LoxObject accept(ExprVisitor& visitor) override {
 			return visitor.visitLiteralExpr(*this);
 		}
 		LoxObject value;
@@ -70,7 +70,7 @@ class Unary: public Expr {
 			operator_ = operator__;
 			right = std::move (right_);
 		}
-		LoxObject accept(Visitor& visitor) override {
+		LoxObject accept(ExprVisitor& visitor) override {
 			return visitor.visitUnaryExpr(*this);
 		}
 		Token operator_;

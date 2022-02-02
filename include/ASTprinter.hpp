@@ -8,7 +8,7 @@
 
 namespace lox {
 
-class ASTprinter: public Visitor {
+class ASTprinter: public ExprVisitor {
     public:
         void print(std::unique_ptr<Expr>& expr) {
             expr->accept(*this);

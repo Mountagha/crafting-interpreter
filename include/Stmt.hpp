@@ -10,10 +10,10 @@ namespace lox {
 class Expression;
 class Print;
 
-class Visitor {
+class StmtVisitor {
 	public:
-		virtual LoxObject visitExpressionStmt( Expression& stmt) = 0;
-		virtual LoxObject visitPrintStmt( Print& stmt) = 0;
+		virtual void visitExpressionStmt( Expression& stmt) = 0;
+		virtual void visitPrintStmt( Print& stmt) = 0;
 };
 
 class Stmt {
@@ -21,7 +21,7 @@ class Stmt {
 	public:
 		Stmt() = default;
 		~Stmt() = default;
-		virtual LoxObject accept(Visitor& visitor) = 0;
+		virtual void accept(StmtVisitor& visitor) = 0;
 };
 
 class Expression: public Stmt {
@@ -29,8 +29,8 @@ class Expression: public Stmt {
 		Expression(std::unique_ptr<Expr>&& expression_) {
 			expression = std::move (expression_);
 		}
-		LoxObject accept(Visitor& visitor) override {
-			return visitor.visitExpressionStmt(*this);
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitExpressionStmt(*this);
 		}
 		std::unique_ptr<Expr> expression;
 };
@@ -40,8 +40,8 @@ class Print: public Stmt {
 		Print(std::unique_ptr<Expr>&& expression_) {
 			expression = std::move (expression_);
 		}
-		LoxObject accept(Visitor& visitor) override {
-			return visitor.visitPrintStmt(*this);
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitPrintStmt(*this);
 		}
 		std::unique_ptr<Expr> expression;
 };
