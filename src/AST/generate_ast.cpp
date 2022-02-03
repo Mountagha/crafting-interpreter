@@ -158,7 +158,8 @@ int main(int argc, char *argv[]) {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
         {"Grouping", "Expr* expression"},
         {"Literal", "LoxObject value"},
-        {"Unary", "Token operator_, Expr* right"} 
+        {"Unary", "Token operator_, Expr* right"},
+        {"Variable", "Token name"}
     };
 
     std::vector<std::string> includes {"\"token.hpp\"", "\"loxObject.hpp\"", "<memory>"};
@@ -166,7 +167,8 @@ int main(int argc, char *argv[]) {
 
     std::map<std::string, std::string> stmt_map {
         {"Expression", "Expr* expression"},
-        {"Print", "Expr* expression"}
+        {"Print", "Expr* expression"},
+        {"Var", "Token name, Expr* initializer"}
     };
 
     includes.push_back("\"Expr.hpp\"");

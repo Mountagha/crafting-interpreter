@@ -9,11 +9,13 @@ namespace lox {
 
 class Expression;
 class Print;
+class Var;
 
 class StmtVisitor {
 	public:
 		virtual void visitExpressionStmt( Expression& stmt) = 0;
 		virtual void visitPrintStmt( Print& stmt) = 0;
+		virtual void visitVarStmt( Var& stmt) = 0;
 };
 
 class Stmt {
@@ -44,6 +46,19 @@ class Print: public Stmt {
 			visitor.visitPrintStmt(*this);
 		}
 		std::unique_ptr<Expr> expression;
+};
+
+class Var: public Stmt {
+	public:
+		Var(Token name_, std::unique_ptr<Expr>&& initializer_) {
+			name = name_;
+			initializer = std::move (initializer_);
+		}
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitVarStmt(*this);
+		}
+		Token name;
+		std::unique_ptr<Expr> initializer;
 };
 
 } // lox namespace

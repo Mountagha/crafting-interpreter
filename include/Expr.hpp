@@ -10,6 +10,7 @@ class Binary;
 class Grouping;
 class Literal;
 class Unary;
+class Variable;
 
 class ExprVisitor {
 	public:
@@ -17,6 +18,7 @@ class ExprVisitor {
 		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
 		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
 		virtual LoxObject visitUnaryExpr( Unary& expr) = 0;
+		virtual LoxObject visitVariableExpr( Variable& expr) = 0;
 };
 
 class Expr {
@@ -75,6 +77,17 @@ class Unary: public Expr {
 		}
 		Token operator_;
 		std::unique_ptr<Expr> right;
+};
+
+class Variable: public Expr {
+	public:
+		Variable(Token name_) {
+			name = name_;
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitVariableExpr(*this);
+		}
+		Token name;
 };
 
 } // lox namespace

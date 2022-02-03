@@ -28,6 +28,17 @@ class Parser {
             return equality();
         }
 
+        SExpr declaration() {
+            try {
+                if (match ({VAR})) return varDeclaration();
+
+                return statement();
+            } catch (ParseError error) {
+                synchronize();
+                return SExpr{};
+            }
+        }
+
         SExpr statement() {
             if (match ({PRINT})) return printStatement();
 
@@ -38,6 +49,18 @@ class Parser {
             PExpr value = expression();
             consume(SEMICOLON, "Expect ';' after value.");
             return std::make_unique<Print>(std::move(value));
+        }
+
+        SExpr varDeclaration() {
+            Token name = consume(IDENTIFIER, "Expect variable name.");
+
+            PExpr initializer;
+            if (match ({EQUAL})) {
+                initializer = expression();
+            }
+
+            consume(SEMICOLON, "Expect ';' after variable declaration.");
+            return std::make_unique<Var>(name, std::move(initializer));
         }
 
         SExpr expressionStatement() {
@@ -142,7 +165,7 @@ class Parser {
             if (match({TRUE})) return std::make_unique<Literal>(LoxObject(true));
             if (match({NIL})) return std::make_unique<Literal>(LoxObject());
             
-        
+            if (match({IDENTIFIER})) return std::make_unique<Variable>(previous());
 
             if (match({NUMBER, STRING})) 
                 return std::make_unique<Literal>(LoxObject(previous()));
