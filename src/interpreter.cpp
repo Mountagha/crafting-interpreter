@@ -53,6 +53,10 @@ LoxObject Interpreter::visitBinaryExpr(Binary& expr) {
 
 }
 
+LoxObject Interpreter::visitVariableExpr(Variable& expr) {
+    return environment.get(expr.name);
+}
+
 // Stmt
 void Interpreter::visitExpressionStmt(Expression& stmt) {
     evaluate(stmt.expression);
@@ -62,6 +66,16 @@ void Interpreter::visitPrintStmt(Print& stmt) {
     LoxObject value = evaluate(stmt.expression);
     std::cout << value << '\n';
 }
+
+void Interpreter::visitVarStmt(Var& stmt) {
+    LoxObject value;
+    if (stmt.initializer) {
+        value = evaluate(stmt.initializer);
+    }
+    environment.define(stmt.name.lexeme, value); 
+}
+
+
 
 void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements) {
     try

@@ -6,6 +6,7 @@
 
 namespace lox { 
 
+class Assign;
 class Binary;
 class Grouping;
 class Literal;
@@ -14,6 +15,7 @@ class Variable;
 
 class ExprVisitor {
 	public:
+		virtual LoxObject visitAssignExpr( Assign& expr) = 0;
 		virtual LoxObject visitBinaryExpr( Binary& expr) = 0;
 		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
 		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
@@ -27,6 +29,19 @@ class Expr {
 		Expr() = default;
 		~Expr() = default;
 		virtual LoxObject accept(ExprVisitor& visitor) = 0;
+};
+
+class Assign: public Expr {
+	public:
+		Assign(Token name_, std::unique_ptr<Expr>&& value_) {
+			name = name_;
+			value = std::move (value_);
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitAssignExpr(*this);
+		}
+		Token name;
+		std::unique_ptr<Expr> value;
 };
 
 class Binary: public Expr {

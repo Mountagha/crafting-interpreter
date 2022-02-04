@@ -56,7 +56,8 @@ namespace lox
         //ASTprinter{}.print(expression);
 
         // should be declared static to persist data accross different executions.
-        Interpreter{}.interpret(statements);
+        static Interpreter interpreter{};
+        interpreter.interpret(statements);
          
     }
     void Lox::runFile(std::string path)

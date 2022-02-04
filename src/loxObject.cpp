@@ -182,7 +182,7 @@ LoxObject& LoxObject::operator-=(const LoxObject& o) {
             case LoxType::Bool:
                 throw std::runtime_error("Cannot subtract bools.");
             case LoxType::Number:
-                number -= number;
+                number -= o.number;
                 break;
             case LoxType::String:
                 throw std::runtime_error("Cannot subtract strings.");

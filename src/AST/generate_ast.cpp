@@ -156,6 +156,7 @@ int main(int argc, char *argv[]) {
     std::string output_dir = argv[1];
     std::map<std::string, std::string> expr_map {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
+        {"Assign", "Token name, Expr* value"},
         {"Grouping", "Expr* expression"},
         {"Literal", "LoxObject value"},
         {"Unary", "Token operator_, Expr* right"},
