@@ -57,6 +57,12 @@ LoxObject Interpreter::visitVariableExpr(Variable& expr) {
     return environment.get(expr.name);
 }
 
+LoxObject Interpreter::visitAssignExpr(Assign& expr) {
+    LoxObject value = evaluate(expr.value);
+    environment.assign(expr.name, value);
+    return value;
+}
+
 // Stmt
 void Interpreter::visitExpressionStmt(Expression& stmt) {
     evaluate(stmt.expression);
@@ -73,6 +79,25 @@ void Interpreter::visitVarStmt(Var& stmt) {
         value = evaluate(stmt.initializer);
     }
     environment.define(stmt.name.lexeme, value); 
+}
+
+void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, Environment* env) {
+    Environment* previous = &environment;
+    try {
+        environment = env;
+
+        for (auto& statement: statements) {
+            execute(statement);
+        }
+    } catch (...) {
+        environment = previous;
+    }
+    environment = previous; // @TODO change this bad code
+}
+
+void Interpreter::visitBlockStmt(Block& stmt) {
+    auto env = std::make_unique<Environment>(environment);
+    executeBlock(stmt.statements, env.get());
 }
 
 

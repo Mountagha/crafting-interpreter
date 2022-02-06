@@ -19,16 +19,20 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         LoxObject visitUnaryExpr(Unary& expr) override;
         LoxObject visitBinaryExpr(Binary& expr) override;
         LoxObject visitVariableExpr(Variable& expr);
+        LoxObject visitAssignExpr(Assign& expr);
+
         // Stmt
         void visitExpressionStmt(Expression& stmt) override;
         void visitPrintStmt(Print& stmt) override;
         void visitVarStmt(Var& stmt) override;
+        void visitBlockStmt(Block& stmt) override;
 
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
     
     private:
 
         Environment environment{};
+        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, Environment* Environment); 
 
         LoxObject evaluate(std::unique_ptr<Expr>& expr) {
             return expr->accept(*this);
@@ -37,6 +41,8 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void execute(std::unique_ptr<Stmt>& stmt) {
             stmt->accept(*this);
         }
+
+
 
 };
 

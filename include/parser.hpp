@@ -7,6 +7,7 @@
 #include "token.hpp"
 #include "lox.hpp"
 #include "Stmt.hpp"
+#include "type.hpp"
 
 
 namespace lox {
@@ -25,7 +26,7 @@ class Parser {
         unsigned int current;
 
         PExpr expression() {
-            return equality();
+            return assignment();
         }
 
         SExpr declaration() {
@@ -41,6 +42,7 @@ class Parser {
 
         SExpr statement() {
             if (match ({PRINT})) return printStatement();
+            if (match ({LEFT_BRACE})) return std::make_unique<Block>(block());
 
             return expressionStatement();
         }        
@@ -67,6 +69,32 @@ class Parser {
             PExpr expr = expression();
             consume(SEMICOLON, "Expect ';' after expression.");
             return std::make_unique<Expression>(std::move(expr));
+        }
+
+        std::vector<SExpr> block() {
+            std::vector<SExpr> statements{};
+            while(!check(RIGHT_BRACE) && !isAtEnd()) {
+                statements.push_back(declaration());
+            }
+            consume(RIGHT_BRACE, "Expect '}' after block.");
+            return statements;
+        }
+
+        PExpr assignment(){
+            PExpr expr = equality();
+
+            if (match ({EQUAL})) {
+                Token equals = previous();
+                PExpr value = assignment();
+
+                TypeIdentifier identifier{};
+                if (identifier.identify(expr) == Type::Variable) {
+                    Token name = static_cast<Variable*>(expr.get())->name;
+                    return std::make_unique<Assign>(name, std::move(value));
+                }
+                Lox::error(equals, "Invalid assigment target.");
+            }
+            return expr;
         }
 
         PExpr equality() {

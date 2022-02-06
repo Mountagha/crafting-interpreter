@@ -4,15 +4,18 @@
 #include "loxObject.hpp"
 #include <memory>
 #include "Expr.hpp"
+#include <vector>
 
 namespace lox { 
 
+class Block;
 class Expression;
 class Print;
 class Var;
 
 class StmtVisitor {
 	public:
+		virtual void visitBlockStmt( Block& stmt) = 0;
 		virtual void visitExpressionStmt( Expression& stmt) = 0;
 		virtual void visitPrintStmt( Print& stmt) = 0;
 		virtual void visitVarStmt( Var& stmt) = 0;
@@ -24,6 +27,17 @@ class Stmt {
 		Stmt() = default;
 		~Stmt() = default;
 		virtual void accept(StmtVisitor& visitor) = 0;
+};
+
+class Block: public Stmt {
+	public:
+		Block(std::vector<std::unique_ptr<Stmt>> statements_) {
+			statements = statements_;
+		}
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitBlockStmt(*this);
+		}
+		std::vector<std::unique_ptr<Stmt>> statements;
 };
 
 class Expression: public Stmt {
