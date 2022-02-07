@@ -81,8 +81,8 @@ void Interpreter::visitVarStmt(Var& stmt) {
     environment.define(stmt.name.lexeme, value); 
 }
 
-void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, Environment* env) {
-    Environment* previous = &environment;
+void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment env) {
+    auto previous = environment;
     try {
         environment = env;
 
@@ -96,8 +96,8 @@ void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, E
 }
 
 void Interpreter::visitBlockStmt(Block& stmt) {
-    auto env = std::make_unique<Environment>(environment);
-    executeBlock(stmt.statements, env.get());
+    auto env = std::make_shared<Environment>(environment);
+    executeBlock(stmt.statements, env);
 }
 
 

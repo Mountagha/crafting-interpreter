@@ -43,10 +43,10 @@ namespace lox
         Scanner scanner(source);
         std::vector<Token> tokens = scanner.scanTokens();
 
-        for (Token token : tokens)
-        {
-            std::cout << token << std::endl;
-        }
+        //for (Token token : tokens)
+        //{
+        //    std::cout << token << std::endl;
+        //}
         Parser parser{tokens};
         std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
 
