@@ -31,8 +31,8 @@ class Stmt {
 
 class Block: public Stmt {
 	public:
-		Block(std::vector<std::unique_ptr<Stmt>> statements_) {
-			statements = statements_;
+		Block(std::vector<std::unique_ptr<Stmt>>&& statements_) {
+			statements = std::move(statements_);
 		}
 		void accept(StmtVisitor& visitor) override {
 			visitor.visitBlockStmt(*this);
