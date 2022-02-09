@@ -31,8 +31,8 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
     
     private:
 
-        PEnvironment environment;
-        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
+        Environment environment;
+        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment& Environment); 
 
         LoxObject evaluate(std::unique_ptr<Expr>& expr) {
             return expr->accept(*this);

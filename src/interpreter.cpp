@@ -81,10 +81,10 @@ void Interpreter::visitVarStmt(Var& stmt) {
     environment.define(stmt.name.lexeme, value); 
 }
 
-void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment env) {
+void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment& env) {
     auto previous = environment;
     try {
-        environment = env;
+        environment = *env;
 
         for (auto& statement: statements) {
             execute(statement);

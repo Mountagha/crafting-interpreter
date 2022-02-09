@@ -4,8 +4,8 @@
 namespace lox {
 
 Environment::Environment() { enclosing = nullptr; }
-Environment::Environment(PEnvironment environment) { enclosing = environment; }
-Environment::~Environment () { }
+Environment::Environment(Environment* environment) { enclosing = environment; }
+Environment::~Environment () { delete enclosing; }
 
 void Environment::define(std::string s, LoxObject value) {
     values.insert_or_assign(s, value);

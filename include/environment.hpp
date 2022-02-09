@@ -14,13 +14,13 @@ using PEnvironment = std::shared_ptr<Environment>;
 class Environment {
     public:
         Environment();
-        Environment(PEnvironment enclosing);
+        Environment(Environment* enclosing);
         void define(std::string s, LoxObject value);
         void assign(Token name, LoxObject value);
         LoxObject get(Token name);   
         ~Environment();
     private:
-        PEnvironment enclosing;
+        Environment* enclosing;
         std::unordered_map<std::string, LoxObject> values{}; 
 };
 

@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
     defineAST(output_dir, "Expr", expr_map, includes, "LoxObject");
 
     std::map<std::string, std::string> stmt_map {
-        {"Block", "std::vector<std::unique_ptr<Stmt>> statements"},
+        {"Block", "std::vector<std::unique_ptr<Stmt>>&& statements"},
         {"Expression", "Expr* expression"},
         {"Print", "Expr* expression"},
         {"Var", "Token name, Expr* initializer"}
