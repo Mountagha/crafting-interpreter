@@ -12,7 +12,7 @@ namespace lox {
 class Interpreter : public ExprVisitor, public  StmtVisitor{
 
     public:
-        Interpreter() = default;
+        Interpreter();
         // Expr
         LoxObject visitLiteralExpr(Literal& expr) override;
         LoxObject visitGroupingExpr(Grouping& expr) override;
@@ -31,8 +31,8 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
     
     private:
 
-        Environment environment;
-        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment& Environment); 
+        PEnvironment environment;
+        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
 
         LoxObject evaluate(std::unique_ptr<Expr>& expr) {
             return expr->accept(*this);
