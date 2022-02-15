@@ -2,6 +2,10 @@
 
 namespace lox {
 
+Interpreter::Interpreter() {
+    environment = std::make_shared<Environment>();
+}
+
 LoxObject Interpreter::visitLiteralExpr(Literal& expr) {
     return expr.value;
 }
@@ -54,12 +58,12 @@ LoxObject Interpreter::visitBinaryExpr(Binary& expr) {
 }
 
 LoxObject Interpreter::visitVariableExpr(Variable& expr) {
-    return environment.get(expr.name);
+    return environment->get(expr.name);
 }
 
 LoxObject Interpreter::visitAssignExpr(Assign& expr) {
     LoxObject value = evaluate(expr.value);
-    environment.assign(expr.name, value);
+    environment->assign(expr.name, value);
     return value;
 }
 
@@ -78,13 +82,13 @@ void Interpreter::visitVarStmt(Var& stmt) {
     if (stmt.initializer) {
         value = evaluate(stmt.initializer);
     }
-    environment.define(stmt.name.lexeme, value); 
+    environment->define(stmt.name.lexeme, value); 
 }
 
-void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment& env) {
+void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment env) {
     auto previous = environment;
     try {
-        environment = *env;
+        environment = env;
 
         for (auto& statement: statements) {
             execute(statement);
@@ -96,7 +100,7 @@ void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, P
 }
 
 void Interpreter::visitBlockStmt(Block& stmt) {
-    auto env = std::make_shared<Environment>(environment);
+    auto env = std::make_shared<Environment>(environment); 
     executeBlock(stmt.statements, env);
 }
 

@@ -169,6 +169,7 @@ int main(int argc, char *argv[]) {
     std::map<std::string, std::string> stmt_map {
         {"Block", "std::vector<std::unique_ptr<Stmt>>&& statements"},
         {"Expression", "Expr* expression"},
+        {"If", "Expr* condition, Stmt* thenBranch, Stmt* elseBranch"},
         {"Print", "Expr* expression"},
         {"Var", "Token name, Expr* initializer"}
     };

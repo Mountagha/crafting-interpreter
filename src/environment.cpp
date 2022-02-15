@@ -4,8 +4,24 @@
 namespace lox {
 
 Environment::Environment() { enclosing = nullptr; }
-Environment::Environment(Environment* environment) { enclosing = environment; }
-Environment::~Environment () { delete enclosing; }
+Environment::Environment(PEnvironment environment) { enclosing = environment; }
+Environment::~Environment () { }
+
+PEnvironment Environment::createNew(PEnvironment encl) {
+    return std::make_shared<Environment>(encl);
+}
+
+PEnvironment Environment::copy(PEnvironment env, PEnvironment encl) {
+    auto newEnv = createNew(encl);
+    newEnv->values = env->values;
+    return newEnv;
+}
+
+PEnvironment Environment::copy() {
+    auto newEnv = createNew(enclosing);
+    newEnv->values = values;
+    return newEnv;
+}
 
 void Environment::define(std::string s, LoxObject value) {
     values.insert_or_assign(s, value);

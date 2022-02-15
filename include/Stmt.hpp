@@ -10,6 +10,7 @@ namespace lox {
 
 class Block;
 class Expression;
+class If;
 class Print;
 class Var;
 
@@ -17,6 +18,7 @@ class StmtVisitor {
 	public:
 		virtual void visitBlockStmt( Block& stmt) = 0;
 		virtual void visitExpressionStmt( Expression& stmt) = 0;
+		virtual void visitIfStmt( If& stmt) = 0;
 		virtual void visitPrintStmt( Print& stmt) = 0;
 		virtual void visitVarStmt( Var& stmt) = 0;
 };
@@ -32,12 +34,12 @@ class Stmt {
 class Block: public Stmt {
 	public:
 		Block(std::vector<std::unique_ptr<Stmt>>&& statements_) {
-			statements = std::move(statements_);
+			statements = statements_;
 		}
 		void accept(StmtVisitor& visitor) override {
 			visitor.visitBlockStmt(*this);
 		}
-		std::vector<std::unique_ptr<Stmt>> statements;
+		std::vector<std::unique_ptr<Stmt>>&& statements;
 };
 
 class Expression: public Stmt {
@@ -49,6 +51,21 @@ class Expression: public Stmt {
 			visitor.visitExpressionStmt(*this);
 		}
 		std::unique_ptr<Expr> expression;
+};
+
+class If: public Stmt {
+	public:
+		If(std::unique_ptr<Expr>&& condition_, std::unique_ptr<Stmt>&& thenBranch_, std::unique_ptr<Stmt>&& elseBranch_) {
+			condition = std::move (condition_);
+			thenBranch = std::move (thenBranch_);
+			elseBranch = std::move (elseBranch_);
+		}
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitIfStmt(*this);
+		}
+		std::unique_ptr<Expr> condition;
+		std::unique_ptr<Stmt> thenBranch;
+		std::unique_ptr<Stmt> elseBranch;
 };
 
 class Print: public Stmt {

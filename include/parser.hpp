@@ -41,11 +41,26 @@ class Parser {
         }
 
         SExpr statement() {
+            if (match ({IF})) return ifStatement();
             if (match ({PRINT})) return printStatement();
             if (match ({LEFT_BRACE})) return std::make_unique<Block>(block());
 
             return expressionStatement();
         }        
+
+        SExpr ifStatement() {
+            consume(LEFT_PAREN, "Expect '(' after 'if'.");
+            PExpr condition = expression();
+            consume(RIGHT_PARENT, "Expect ')' after if condition.");
+
+            SExpr thenBranch = statement();
+            SExpr elseBranch;
+            if (match ({ELSE})) {
+                elseBranch = statement();
+            }
+
+            return std::make_unique<If>(condition, thenBranch, elseBranch);
+        }
 
         SExpr printStatement() {
             PExpr value = expression();
