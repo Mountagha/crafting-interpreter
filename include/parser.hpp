@@ -43,9 +43,55 @@ class Parser {
         SExpr statement() {
             if (match ({IF})) return ifStatement();
             if (match ({PRINT})) return printStatement();
+            if (match ({WHILE})) return whileStatement();
             if (match ({LEFT_BRACE})) return std::make_unique<Block>(block());
 
             return expressionStatement();
+        }
+
+        SExpr forStatement() {
+            consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+            SExpr initalizer;
+            if (match ({SEMICOLON})); // do nothing i.e keep initializer to nullptr
+            else if (match ({VAR})) {
+                initalizer = varDeclaration();
+            } else {
+                initalizer = expressionStatement();
+            }
+
+            PExpr condition;
+            if ( !check(SEMICOLON)) {
+                condition = expression();
+            }
+            consume(SEMICOLON, "Expect ';' after loop condition.");
+
+            PExpr increment;
+            if (!check(RIGHT_PARENT)) {
+                increment = expression();
+            }
+            consume(RIGHT_PARENT, "Expect ')' after for clauses.");
+
+            SExpr body = statement();
+
+            if (increment) {
+                std::vector<SExpr> statements;
+                statements.push_back(std::move(body));
+                statements.push_back(std::make_unique<Expression>(std::move(increment)));
+                body = std::make_unique<Block>(statements);
+            }
+
+            if (!condition) condition = std::make_unique<Literal>(true);
+            body = std::make_unique<While>(condition, body);
+
+            if (initalizer) {
+                std::vector<SExpr> statements;
+                statements.push_back(std::move(initalizer));
+                statements.push_back(body);
+                body = std::make_unique<Block>(statements);
+            }
+            return body;   
+            
         }        
 
         SExpr ifStatement() {
@@ -59,7 +105,7 @@ class Parser {
                 elseBranch = statement();
             }
 
-            return std::make_unique<If>(condition, thenBranch, elseBranch);
+            return std::make_unique<If>(std::move(condition), std::move(thenBranch), std::move(elseBranch));
         }
 
         SExpr printStatement() {
@@ -80,6 +126,15 @@ class Parser {
             return std::make_unique<Var>(name, std::move(initializer));
         }
 
+        SExpr whileStatement() {
+            consume(LEFT_PAREN, "Expect '(' after a 'while'.");
+            PExpr condition = expression();
+            consume(RIGHT_PARENT, "Expect ')' after condition");
+            SExpr body = statement();
+
+            return std::make_unique<While>(std::move(condition), std::move(body));
+        }
+
         SExpr expressionStatement() {
             PExpr expr = expression();
             consume(SEMICOLON, "Expect ';' after expression.");
@@ -96,7 +151,7 @@ class Parser {
         }
 
         PExpr assignment(){
-            PExpr expr = equality();
+            PExpr expr = Or();
 
             if (match ({EQUAL})) {
                 Token equals = previous();
@@ -111,6 +166,32 @@ class Parser {
             }
             return expr;
         }
+
+        PExpr Or() {
+            PExpr expr = And();
+
+            while (match ({OR})) {
+                Token operator_ = previous();
+                PExpr right = And();
+                expr = std::make_unique<Logical>(
+                        std::move(expr), operator_, std::move(right));
+            }
+            return expr;
+        }
+
+        PExpr And() {
+            PExpr expr = equality();
+
+            while (match ({AND})) {
+                Token operator_ = previous();
+                PExpr right = equality();
+                expr = std::make_unique<Logical>(
+                        std::move(expr), operator_, std::move(right));
+            }
+
+            return expr;
+        }
+
 
         PExpr equality() {
             PExpr expr = comparison();

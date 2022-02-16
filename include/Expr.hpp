@@ -10,6 +10,7 @@ class Assign;
 class Binary;
 class Grouping;
 class Literal;
+class Logical;
 class Unary;
 class Variable;
 
@@ -19,6 +20,7 @@ class ExprVisitor {
 		virtual LoxObject visitBinaryExpr( Binary& expr) = 0;
 		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
 		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
+		virtual LoxObject visitLogicalExpr( Logical& expr) = 0;
 		virtual LoxObject visitUnaryExpr( Unary& expr) = 0;
 		virtual LoxObject visitVariableExpr( Variable& expr) = 0;
 };
@@ -79,6 +81,21 @@ class Literal: public Expr {
 			return visitor.visitLiteralExpr(*this);
 		}
 		LoxObject value;
+};
+
+class Logical: public Expr {
+	public:
+		Logical(std::unique_ptr<Expr>&& left_, Token operator__, std::unique_ptr<Expr>&& right_) {
+			left = std::move (left_);
+			operator_ = operator__;
+			right = std::move (right_);
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitLogicalExpr(*this);
+		}
+		std::unique_ptr<Expr> left;
+		Token operator_;
+		std::unique_ptr<Expr> right;
 };
 
 class Unary: public Expr {

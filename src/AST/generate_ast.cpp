@@ -159,6 +159,7 @@ int main(int argc, char *argv[]) {
         {"Assign", "Token name, Expr* value"},
         {"Grouping", "Expr* expression"},
         {"Literal", "LoxObject value"},
+        {"Logical", "Expr* left, Token operator_, Expr* right"},
         {"Unary", "Token operator_, Expr* right"},
         {"Variable", "Token name"}
     };
@@ -167,11 +168,12 @@ int main(int argc, char *argv[]) {
     defineAST(output_dir, "Expr", expr_map, includes, "LoxObject");
 
     std::map<std::string, std::string> stmt_map {
-        {"Block", "std::vector<std::unique_ptr<Stmt>>&& statements"},
+        {"Block", "std::vector<std::unique_ptr<Stmt>> statements"},
         {"Expression", "Expr* expression"},
         {"If", "Expr* condition, Stmt* thenBranch, Stmt* elseBranch"},
         {"Print", "Expr* expression"},
-        {"Var", "Token name, Expr* initializer"}
+        {"Var", "Token name, Expr* initializer"},
+        {"While", "Expr* condition, Stmt* body"}
     };
 
     includes.push_back("\"Expr.hpp\"");

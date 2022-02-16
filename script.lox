@@ -3,6 +3,8 @@ var b = "two";
 print a + b;
 var a = 2;
 var b = 5;
+var c;
+c = a + b;
 print b / a;
 
 var a = "global a";

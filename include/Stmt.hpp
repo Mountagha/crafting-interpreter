@@ -13,6 +13,7 @@ class Expression;
 class If;
 class Print;
 class Var;
+class While;
 
 class StmtVisitor {
 	public:
@@ -21,6 +22,7 @@ class StmtVisitor {
 		virtual void visitIfStmt( If& stmt) = 0;
 		virtual void visitPrintStmt( Print& stmt) = 0;
 		virtual void visitVarStmt( Var& stmt) = 0;
+		virtual void visitWhileStmt( While& stmt) = 0;
 };
 
 class Stmt {
@@ -34,12 +36,12 @@ class Stmt {
 class Block: public Stmt {
 	public:
 		Block(std::vector<std::unique_ptr<Stmt>>&& statements_) {
-			statements = statements_;
+			statements = std::move(statements_);
 		}
 		void accept(StmtVisitor& visitor) override {
 			visitor.visitBlockStmt(*this);
 		}
-		std::vector<std::unique_ptr<Stmt>>&& statements;
+		std::vector<std::unique_ptr<Stmt>> statements;
 };
 
 class Expression: public Stmt {
@@ -90,6 +92,19 @@ class Var: public Stmt {
 		}
 		Token name;
 		std::unique_ptr<Expr> initializer;
+};
+
+class While: public Stmt {
+	public:
+		While(std::unique_ptr<Expr>&& condition_, std::unique_ptr<Stmt>&& body_) {
+			condition = std::move (condition_);
+			body = std::move (body_);
+		}
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitWhileStmt(*this);
+		}
+		std::unique_ptr<Expr> condition;
+		std::unique_ptr<Stmt> body;
 };
 
 } // lox namespace

@@ -18,14 +18,17 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         LoxObject visitGroupingExpr(Grouping& expr) override;
         LoxObject visitUnaryExpr(Unary& expr) override;
         LoxObject visitBinaryExpr(Binary& expr) override;
-        LoxObject visitVariableExpr(Variable& expr);
-        LoxObject visitAssignExpr(Assign& expr);
+        LoxObject visitVariableExpr(Variable& expr) override;
+        LoxObject visitAssignExpr(Assign& expr) override;
+        LoxObject visitLogicalExpr(Logical& expr) override;
 
         // Stmt
         void visitExpressionStmt(Expression& stmt) override;
+        void visitIfStmt(If& Stmt) override;
         void visitPrintStmt(Print& stmt) override;
         void visitVarStmt(Var& stmt) override;
         void visitBlockStmt(Block& stmt) override;
+        void visitWhileStmt(While& stmt) override;
 
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
     
