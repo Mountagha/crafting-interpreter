@@ -41,6 +41,7 @@ class Parser {
         }
 
         SExpr statement() {
+            if (match ({FOR})) return forStatement();
             if (match ({IF})) return ifStatement();
             if (match ({PRINT})) return printStatement();
             if (match ({WHILE})) return whileStatement();
@@ -78,17 +79,17 @@ class Parser {
                 std::vector<SExpr> statements;
                 statements.push_back(std::move(body));
                 statements.push_back(std::make_unique<Expression>(std::move(increment)));
-                body = std::make_unique<Block>(statements);
+                body = std::make_unique<Block>(std::move(statements));
             }
 
-            if (!condition) condition = std::make_unique<Literal>(true);
-            body = std::make_unique<While>(condition, body);
+            if (!condition) condition = std::make_unique<Literal>(LoxObject(true));
+            body = std::make_unique<While>(std::move(condition), std::move(body));
 
             if (initalizer) {
                 std::vector<SExpr> statements;
                 statements.push_back(std::move(initalizer));
-                statements.push_back(body);
-                body = std::make_unique<Block>(statements);
+                statements.push_back(std::move(body));
+                body = std::make_unique<Block>(std::move(statements));
             }
             return body;   
             

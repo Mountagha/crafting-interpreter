@@ -10,6 +10,18 @@ LoxObject Interpreter::visitLiteralExpr(Literal& expr) {
     return expr.value;
 }
 
+LoxObject Interpreter::visitLogicalExpr(Logical& expr) {
+    LoxObject left = evaluate(expr.left);
+
+    if (expr.operator_.token_type == OR) {
+        if(left) return left;
+    } else {
+        if (!left) return left;
+    }
+
+    return evaluate(expr.right);
+}
+
 LoxObject Interpreter::visitGroupingExpr(Grouping& expr) {
     return evaluate(expr.expression);
 }
@@ -72,6 +84,14 @@ void Interpreter::visitExpressionStmt(Expression& stmt) {
     evaluate(stmt.expression);
 }
 
+void Interpreter::visitIfStmt(If& stmt) {
+    if(evaluate(stmt.condition)) {
+        execute(stmt.thenBranch);
+    } else if (stmt.elseBranch) {
+        execute(stmt.elseBranch);
+    }
+}
+
 void Interpreter::visitPrintStmt(Print& stmt) {
     LoxObject value = evaluate(stmt.expression);
     std::cout << value << '\n';
@@ -83,6 +103,13 @@ void Interpreter::visitVarStmt(Var& stmt) {
         value = evaluate(stmt.initializer);
     }
     environment->define(stmt.name.lexeme, value); 
+}
+
+void Interpreter::visitWhileStmt(While& stmt) {
+    while (evaluate(stmt.condition)) {
+        execute(stmt.body); 
+    }
+    
 }
 
 void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment env) {
