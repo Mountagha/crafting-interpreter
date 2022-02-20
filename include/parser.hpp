@@ -282,7 +282,33 @@ class Parser {
                 return std::make_unique<Unary>(operator_, std::move(right));
             }
 
-            return primary();
+            return call();
+        }
+
+        PExpr call() {
+            PExpr expr = primary();
+
+            while (true){
+                if (match ({LEFT_PAREN})) {
+                    expr = finishCall(expr);
+                } else {
+                    break;
+                }
+            }
+
+            return expr;
+        }
+
+        PExpr finishCall(PExpr& callee) {
+            std::vector<PExpr> arguments;
+            if (!check(RIGHT_BRACE)) {
+                do {
+                    arguments.push_back(expression());
+                } while(match({COMMA}));
+            }
+            
+            Token paren = consume(RIGHT_PARENT, "Expect ')' after arguments.");
+            return std::make_unique<Call>(std::move(callee), paren, std::move(arguments));
         }
 
         PExpr primary() {

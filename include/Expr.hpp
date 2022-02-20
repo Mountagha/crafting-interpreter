@@ -8,6 +8,7 @@ namespace lox {
 
 class Assign;
 class Binary;
+class Call;
 class Grouping;
 class Literal;
 class Logical;
@@ -18,6 +19,7 @@ class ExprVisitor {
 	public:
 		virtual LoxObject visitAssignExpr( Assign& expr) = 0;
 		virtual LoxObject visitBinaryExpr( Binary& expr) = 0;
+		virtual LoxObject visitCallExpr( Call& expr) = 0;
 		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
 		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
 		virtual LoxObject visitLogicalExpr( Logical& expr) = 0;
@@ -59,6 +61,21 @@ class Binary: public Expr {
 		std::unique_ptr<Expr> left;
 		Token operator_;
 		std::unique_ptr<Expr> right;
+};
+
+class Call: public Expr {
+	public:
+		Call(std::unique_ptr<Expr>&& callee_, Token paren_, std::vector<std::unique_ptr<Expr>>&& arguments_) {
+			callee = std::move (callee_);
+			paren = paren_;
+			arguments = std::move(arguments_);
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitCallExpr(*this);
+		}
+		std::unique_ptr<Expr> callee;
+		Token paren;
+		std::vector<std::unique_ptr<Expr>> arguments;
 };
 
 class Grouping: public Expr {

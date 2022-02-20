@@ -156,6 +156,7 @@ int main(int argc, char *argv[]) {
     std::string output_dir = argv[1];
     std::map<std::string, std::string> expr_map {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
+        {"Call", "Expr* callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments"},
         {"Assign", "Token name, Expr* value"},
         {"Grouping", "Expr* expression"},
         {"Literal", "LoxObject value"},
@@ -179,6 +180,6 @@ int main(int argc, char *argv[]) {
     includes.push_back("\"Expr.hpp\"");
     includes.push_back("<vector>");
 
-    defineAST (output_dir, "Stmt", stmt_map, includes, "void");
+    //defineAST (output_dir, "Stmt", stmt_map, includes, "void");
     return 0;
 }
