@@ -69,6 +69,17 @@ LoxObject Interpreter::visitBinaryExpr(Binary& expr) {
 
 }
 
+LoxObject Interpreter::visitCallExpr(Call& expr) {
+    LoxObject callee = evaluate(expr.callee);
+
+    std::vector<LoxObject> arguments {};
+    for (auto& argument : expr.arguments){
+        arguments.push_back(evaluate(argument));
+    }
+
+    return callee(*this, arguments);
+}
+
 LoxObject Interpreter::visitVariableExpr(Variable& expr) {
     return environment->get(expr.name);
 }

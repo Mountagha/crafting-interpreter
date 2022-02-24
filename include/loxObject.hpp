@@ -3,6 +3,8 @@
 #include <string>
 #include <ostream>
 #include "token.hpp"
+#include "interpreter.hpp"
+#include "loxCallable.hpp"
 
 namespace lox {
 
@@ -11,6 +13,7 @@ enum class LoxType {
     Bool,
     Number,
     String,
+    Callable,
 };
 
 inline bool operator<(LoxType a, LoxType b) {
@@ -23,12 +26,15 @@ class LoxObject {
         explicit LoxObject(bool b): lox_type(LoxType::Bool), boolean{b} {}
         explicit LoxObject(double d): lox_type(LoxType::Number), number{d} {}
         explicit LoxObject(std::string s): lox_type(LoxType::String), string{s} {}
+        explicit LoxObject( LoxCallable* callable, Interpreter* in);
         // add Callable later
 
         explicit LoxObject(Token token);
         LoxObject(const LoxObject&);
         LoxObject& operator=(const LoxObject& );
         ~LoxObject();
+
+        LoxObject operator()(Interpreter& in, std::vector<LoxObject> args);
 
 
         friend bool operator==(const LoxObject& a, const LoxObject& b);
@@ -55,15 +61,21 @@ class LoxObject {
         double number = 0.;
         bool boolean = false;
         std::string string = "";
+        LoxCallable* function = nullptr;
+        Interpreter* interpreter = nullptr;
 
         void cast(LoxType t) {
             if (t == lox_type) return;
-            // handle other types later
+            if (lox_type == LoxType::Callable) {
+                throw std::runtime_error("Cannot convert callable to non-callable");
+            }
             switch(t) {
                 case LoxType::Nil: break;
                 case LoxType::Bool: boolean = (bool)(*this); break;
                 case LoxType::Number: number = (double)(*this); break;
                 case LoxType::String: string = (std::string)(*this); break;
+                case LoxType::Callable:
+                    throw std::runtime_error("Cannot convert non-callable to callable");
                 // handle other types later
             }
 

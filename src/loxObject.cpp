@@ -4,6 +4,9 @@
 
 namespace lox {
 
+LoxObject::LoxObject(LoxCallable* callable, Interpreter* in) 
+    : function{callable}, interpreter{in}, lox_type{LoxType::Callable} {}
+
 LoxObject::LoxObject(const LoxObject& o){
     string = o.string;
     number = o.number;
@@ -20,6 +23,13 @@ LoxObject& LoxObject::operator=(const LoxObject& o){
 }
 
 LoxObject::~LoxObject() {} // nothing for now.
+
+LoxObject LoxObject::operator()(Interpreter& in, std::vector<LoxObject> args) {
+    if (lox_type != LoxType::Callable) {
+        std::runtime_error("Cannot call non-callable");
+    }
+    return (*function)(in, args);
+}
 
 LoxObject::LoxObject(Token token) {
     switch(token.token_type) {
