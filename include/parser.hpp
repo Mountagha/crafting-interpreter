@@ -303,6 +303,9 @@ class Parser {
             std::vector<PExpr> arguments;
             if (!check(RIGHT_BRACE)) {
                 do {
+                    if (arguments.size() >= 255) {
+                        Lox::error(peek(), "Can't have more than 255 arguments");
+                    }
                     arguments.push_back(expression());
                 } while(match({COMMA}));
             }
