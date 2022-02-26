@@ -4,6 +4,7 @@
 #include "lox.hpp"
 #include "Stmt.hpp"
 #include "environment.hpp"
+#include "loxCallable.hpp"
 #include <iostream>
 #include <vector>
 
@@ -35,6 +36,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
     
     private:
 
+        PEnvironment globals;
         PEnvironment environment;
         void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
 

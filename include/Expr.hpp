@@ -3,6 +3,7 @@
 #include "token.hpp"
 #include "loxObject.hpp"
 #include <memory>
+#include <vector>
 
 namespace lox { 
 
@@ -68,7 +69,7 @@ class Call: public Expr {
 		Call(std::unique_ptr<Expr>&& callee_, Token paren_, std::vector<std::unique_ptr<Expr>>&& arguments_) {
 			callee = std::move (callee_);
 			paren = paren_;
-			arguments = std::move(arguments_);
+			arguments = std::move (arguments_);
 		}
 		LoxObject accept(ExprVisitor& visitor) override {
 			return visitor.visitCallExpr(*this);

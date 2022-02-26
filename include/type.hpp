@@ -8,7 +8,7 @@ namespace lox {
 
 enum class Type {
     Assign, Binary, Grouping, Literal, Unary, Variable, Logical, Call,
-    Expression, If, Print, Var, Block, While
+    Expression, If, Print, Var, Block, While, Function
 };
 
 class TypeIdentifier : public StmtVisitor, public ExprVisitor {
@@ -43,13 +43,13 @@ class TypeIdentifier : public StmtVisitor, public ExprVisitor {
         LoxObject visitVariableExpr(Variable& expr) override {
             type = Type::Variable; return LoxObject();
         }
-        LoxObject visitUnaryExpr(Unary& expr) {
+        LoxObject visitUnaryExpr(Unary& expr) override {
             type = Type::Unary; return LoxObject();
         }
-        LoxObject visitLogicalExpr(Logical& expr) {
+        LoxObject visitLogicalExpr(Logical& expr) override {
             type = Type::Logical; return LoxObject();
         }
-        LoxObject visitCallExpr(Call& expr) {
+        LoxObject visitCallExpr(Call& expr) override {
             type = Type::Call; return LoxObject();
         }
 
@@ -59,16 +59,19 @@ class TypeIdentifier : public StmtVisitor, public ExprVisitor {
         void visitIfStmt(If& stmt) {
             type = Type::If;
         }
+        void visitFunctionStmt(Function& stmt) override {
+            type = Type::Function;
+        }
         void visitPrintStmt(Print& stmt) override {
             type = Type::Print;
         }
         void visitVarStmt(Var& stmt) override {
             type = Type::Var;
         }
-        void visitBlockStmt(Block& stmt) {
+        void visitBlockStmt(Block& stmt) override {
             type = Type::Block; 
         }
-        void visitWhileStmt(While& stmt) {
+        void visitWhileStmt(While& stmt) override {
             type = Type::While;
         }  
 

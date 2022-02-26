@@ -3,7 +3,10 @@
 namespace lox {
 
 Interpreter::Interpreter() {
-    environment = std::make_shared<Environment>();
+    globals = std::make_shared<Environment>();
+    environment = globals;
+    std::unique_ptr<LoxCallable> clock {static_cast<LoxCallable*>(new TimeFunction())}; 
+    globals->define("clock", LoxObject(clock.get(), this));
 }
 
 LoxObject Interpreter::visitLiteralExpr(Literal& expr) {

@@ -14,6 +14,13 @@ std::string type_from_ptr(const std::string& s){
     return s.substr(0, s.size()-1); // return string without *
 }
 
+bool is_vector_type(const std::string& s) {
+    auto sub = s.find(std::string("std::vector<"));
+    if (sub != std::string::npos)
+        return true;
+    return false;
+}
+
 void declare_classes(std::ostream& out, std::map<std::string, std::string> map) {
     for (const auto& e: map){
         out << "class " + e.first + ";\n";
@@ -69,6 +76,8 @@ void define_type(std::ofstream& out,
         std::vector<std::string> name_type = split(field, " ");
         if (isPointer(name_type[0]))
             line += "std::unique_ptr<" + type_from_ptr(name_type[0]) + ">&& " + name_type[1] + "_, ";
+        else if (is_vector_type(name_type[0]))
+            line += name_type[0] + "&& " + name_type[1] + "_, ";
         else 
             line += field + "_, "; 
     }
@@ -80,7 +89,7 @@ void define_type(std::ofstream& out,
     
     for (const auto& field: fieldList) {
         std::vector<std::string> name_type = split(field, " ");
-        if (isPointer(name_type[0]))
+        if (isPointer(name_type[0]) || is_vector_type(name_type[0]))
             out << "\t\t\t" + name_type[1] + " = std::move (" + name_type[1] + "_);\n";
         else
             out << "\t\t\t" + name_type[1] + " = " + name_type[1] + "_;\n";
@@ -165,12 +174,13 @@ int main(int argc, char *argv[]) {
         {"Variable", "Token name"}
     };
 
-    std::vector<std::string> includes {"\"token.hpp\"", "\"loxObject.hpp\"", "<memory>"};
+    std::vector<std::string> includes {"\"token.hpp\"", "\"loxObject.hpp\"", "<memory>", "<vector>"};
     defineAST(output_dir, "Expr", expr_map, includes, "LoxObject");
 
     std::map<std::string, std::string> stmt_map {
         {"Block", "std::vector<std::unique_ptr<Stmt>> statements"},
         {"Expression", "Expr* expression"},
+        {"Function", "Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body"},
         {"If", "Expr* condition, Stmt* thenBranch, Stmt* elseBranch"},
         {"Print", "Expr* expression"},
         {"Var", "Token name, Expr* initializer"},
@@ -178,8 +188,7 @@ int main(int argc, char *argv[]) {
     };
 
     includes.push_back("\"Expr.hpp\"");
-    includes.push_back("<vector>");
 
-    //defineAST (output_dir, "Stmt", stmt_map, includes, "void");
+    defineAST (output_dir, "Stmt", stmt_map, includes, "void");
     return 0;
 }

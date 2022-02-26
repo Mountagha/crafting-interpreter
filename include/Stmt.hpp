@@ -3,13 +3,14 @@
 #include "token.hpp"
 #include "loxObject.hpp"
 #include <memory>
-#include "Expr.hpp"
 #include <vector>
+#include "Expr.hpp"
 
 namespace lox { 
 
 class Block;
 class Expression;
+class Function;
 class If;
 class Print;
 class Var;
@@ -19,6 +20,7 @@ class StmtVisitor {
 	public:
 		virtual void visitBlockStmt( Block& stmt) = 0;
 		virtual void visitExpressionStmt( Expression& stmt) = 0;
+		virtual void visitFunctionStmt( Function& stmt) = 0;
 		virtual void visitIfStmt( If& stmt) = 0;
 		virtual void visitPrintStmt( Print& stmt) = 0;
 		virtual void visitVarStmt( Var& stmt) = 0;
@@ -36,7 +38,7 @@ class Stmt {
 class Block: public Stmt {
 	public:
 		Block(std::vector<std::unique_ptr<Stmt>>&& statements_) {
-			statements = std::move(statements_);
+			statements = std::move (statements_);
 		}
 		void accept(StmtVisitor& visitor) override {
 			visitor.visitBlockStmt(*this);
@@ -53,6 +55,21 @@ class Expression: public Stmt {
 			visitor.visitExpressionStmt(*this);
 		}
 		std::unique_ptr<Expr> expression;
+};
+
+class Function: public Stmt {
+	public:
+		Function(Token name_, std::vector<Token>&& params_, std::vector<std::unique_ptr<Stmt>>&& body_) {
+			name = name_;
+			params = std::move (params_);
+			body = std::move (body_);
+		}
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitFunctionStmt(*this);
+		}
+		Token name;
+		std::vector<Token> params;
+		std::vector<std::unique_ptr<Stmt>> body;
 };
 
 class If: public Stmt {

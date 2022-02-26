@@ -31,6 +31,7 @@ class Parser {
 
         SExpr declaration() {
             try {
+                if (match ({FUN})) return function("function");
                 if (match ({VAR})) return varDeclaration();
 
                 return statement();
@@ -140,6 +141,26 @@ class Parser {
             PExpr expr = expression();
             consume(SEMICOLON, "Expect ';' after expression.");
             return std::make_unique<Expression>(std::move(expr));
+        }
+
+        SExpr function(std::string kind) {
+            Token name = consume(IDENTIFIER, "Expect " + kind + " name");
+            consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+            std::vector<Token> parameters {};
+            if (!check(RIGHT_PARENT)){
+                do {
+                    if (parameters.size() >= 255) {
+                        Lox::error(peek(), "Can't have more than 255 parameters");
+                    }
+
+                    parameters.push_back(
+                        consume(IDENTIFIER, "Expect parameter name.")
+                    );
+                } while (match ({COMMA}));
+            }
+            consume(RIGHT_PARENT, "Expect ')' after parameteres.");
+            std::vector<SExpr> body = block();
+            return std::make_unique<Function>(name, std::move(parameters), std::move(body));
         }
 
         std::vector<SExpr> block() {
