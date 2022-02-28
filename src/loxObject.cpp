@@ -1,4 +1,6 @@
 #include "loxObject.hpp"
+#include "loxCallable.hpp"
+#include "interpreter.hpp"
 #include "lox.hpp"
 #include <sstream>
 

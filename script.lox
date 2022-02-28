@@ -50,9 +50,9 @@ while (a < 10) {
 }
 
 // for loops
-for (var x = 1; x < 10; x = x + 1) {
-  print x;
-}
+//for (var x = 1; x < 10; x = x + 1) {
+//  print x;
+//}
 
 // fibonnaci
 var a = 0;
@@ -63,3 +63,12 @@ for (var b = 1; a < 10000; b = temp + b) {
   temp = a;
   a = b;
 }
+
+// declaration
+fun test() {
+  print "success test toy func 1";
+}
+
+// call
+test();
+

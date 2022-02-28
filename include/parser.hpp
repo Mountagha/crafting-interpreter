@@ -159,6 +159,8 @@ class Parser {
                 } while (match ({COMMA}));
             }
             consume(RIGHT_PARENT, "Expect ')' after parameteres.");
+
+            consume(LEFT_BRACE, "Expect ')' before " + kind + " body.");
             std::vector<SExpr> body = block();
             return std::make_unique<Function>(name, std::move(parameters), std::move(body));
         }
@@ -322,7 +324,7 @@ class Parser {
 
         PExpr finishCall(PExpr& callee) {
             std::vector<PExpr> arguments;
-            if (!check(RIGHT_BRACE)) {
+            if (!check(RIGHT_PARENT)) {
                 do {
                     if (arguments.size() >= 255) {
                         Lox::error(peek(), "Can't have more than 255 arguments");

@@ -98,6 +98,11 @@ void Interpreter::visitExpressionStmt(Expression& stmt) {
     evaluate(stmt.expression);
 }
 
+void Interpreter::visitFunctionStmt(Function& stmt) {
+    std::unique_ptr<LoxCallable> function {static_cast<LoxCallable*>(new LoxFunction(&stmt, environment))};
+    environment->define(stmt.name.lexeme, LoxObject(function.get(), this));
+}
+
 void Interpreter::visitIfStmt(If& stmt) {
     if(evaluate(stmt.condition)) {
         execute(stmt.thenBranch);

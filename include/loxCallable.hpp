@@ -3,7 +3,8 @@
 #include <vector>
 #include <chrono>
 #include "loxObject.hpp"
-#include "interpreter.hpp"
+#include "Stmt.hpp"
+#include "environment.hpp"
 
 
 namespace lox {
@@ -36,7 +37,16 @@ class TimeFunction : public LoxCallable {
 };
 
 class LoxFunction : public LoxCallable {
-
+    public:
+        LoxFunction(Function* declaration, PEnvironment encl);
+        ~LoxFunction();
+        size_t arity() const override { return declaration->params.size(); }
+        std::string name() const override { return "<fn " + declaration->name.lexeme + ">"; }
+        LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
+    
+    private:
+        Function* declaration;
+        PEnvironment enclosing;
 };
 
 }

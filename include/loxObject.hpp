@@ -2,9 +2,8 @@
 
 #include <string>
 #include <ostream>
+#include <vector>
 #include "token.hpp"
-#include "interpreter.hpp"
-#include "loxCallable.hpp"
 
 namespace lox {
 
@@ -19,6 +18,9 @@ enum class LoxType {
 inline bool operator<(LoxType a, LoxType b) {
     return static_cast<int>(a) < static_cast<int>(b);
 }
+
+class Interpreter;
+class LoxCallable;
 
 class LoxObject {
     public:

@@ -1,10 +1,11 @@
 #pragma once
 
+#include "loxCallable.hpp"
+#include "environment.hpp"
+#include "loxObject.hpp"
 #include "Expr.hpp"
 #include "lox.hpp"
 #include "Stmt.hpp"
-#include "environment.hpp"
-#include "loxCallable.hpp"
 #include <iostream>
 #include <vector>
 
@@ -26,6 +27,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
 
         // Stmt
         void visitExpressionStmt(Expression& stmt) override;
+        void visitFunctionStmt(Function& stmt) override;
         void visitIfStmt(If& Stmt) override;
         void visitPrintStmt(Print& stmt) override;
         void visitVarStmt(Var& stmt) override;
@@ -33,12 +35,12 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void visitWhileStmt(While& stmt) override;
 
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
+        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
     
     private:
 
         PEnvironment globals;
         PEnvironment environment;
-        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
 
         LoxObject evaluate(std::unique_ptr<Expr>& expr) {
             return expr->accept(*this);
