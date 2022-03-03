@@ -99,8 +99,8 @@ void Interpreter::visitExpressionStmt(Expression& stmt) {
 }
 
 void Interpreter::visitFunctionStmt(Function& stmt) {
-    std::unique_ptr<LoxCallable> function {static_cast<LoxCallable*>(new LoxFunction(&stmt, environment))};
-    environment->define(stmt.name.lexeme, LoxObject(function.get(), this));
+    LoxCallable* function {static_cast<LoxCallable*>(new LoxFunction(&stmt, environment))};
+    environment->define(stmt.name.lexeme, LoxObject(function, this));
 }
 
 void Interpreter::visitIfStmt(If& stmt) {

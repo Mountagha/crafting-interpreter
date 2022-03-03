@@ -64,11 +64,19 @@ for (var b = 1; a < 10000; b = temp + b) {
   a = b;
 }
 
-// declaration
+// function with no parameters
 fun test() {
   print "success test toy func 1";
 }
 
 // call
 test();
+
+// function with parameters
+fun say_hi(first, last) {
+  print "Hi, " + first + " " + last + "!";
+}
+
+// call
+say_hi("Dear", "Mountagha");
 

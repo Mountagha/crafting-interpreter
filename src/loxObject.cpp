@@ -14,6 +14,8 @@ LoxObject::LoxObject(const LoxObject& o){
     number = o.number;
     lox_type = o.lox_type;
     boolean = o.boolean;
+    function = o.function;
+    interpreter = o.interpreter;
 }
 
 LoxObject& LoxObject::operator=(const LoxObject& o){
@@ -21,6 +23,8 @@ LoxObject& LoxObject::operator=(const LoxObject& o){
     number = o.number;
     lox_type = o.lox_type;
     boolean = o.boolean;
+    function = o.function;
+    interpreter = o.interpreter;
     return *this;
 }
 
