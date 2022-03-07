@@ -45,6 +45,7 @@ class Parser {
             if (match ({FOR})) return forStatement();
             if (match ({IF})) return ifStatement();
             if (match ({PRINT})) return printStatement();
+            if (match ({RETURN})) return returnStatement();
             if (match ({WHILE})) return whileStatement();
             if (match ({LEFT_BRACE})) return std::make_unique<Block>(block());
 
@@ -114,6 +115,17 @@ class Parser {
             PExpr value = expression();
             consume(SEMICOLON, "Expect ';' after value.");
             return std::make_unique<Print>(std::move(value));
+        }
+
+        SExpr returnStatement() {
+            Token keyword = previous();
+            PExpr value;
+            if (!check(SEMICOLON)) {
+                value = expression();
+            }
+
+            consume(SEMICOLON, "Expect ';' after return value.");
+            return std::make_unique<Return>(keyword, std::move(value));
         }
 
         SExpr varDeclaration() {

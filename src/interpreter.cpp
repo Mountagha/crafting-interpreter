@@ -1,4 +1,5 @@
 #include "interpreter.hpp"
+#include "return.hpp"
 
 namespace lox {
 
@@ -116,6 +117,15 @@ void Interpreter::visitPrintStmt(Print& stmt) {
     std::cout << value << '\n';
 }
 
+void Interpreter::visitReturnStmt(Return& stmt) {
+    LoxObject value;
+    if (stmt.value) {
+        value = evaluate(stmt.value);
+    }
+
+    throw ReturnExcept(value); // ugly but author gives reasonable excuses.
+}
+
 void Interpreter::visitVarStmt(Var& stmt) {
     LoxObject value;
     if (stmt.initializer) {
@@ -132,22 +142,27 @@ void Interpreter::visitWhileStmt(While& stmt) {
 }
 
 void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment env) {
-    auto previous = environment;
-    try {
-        environment = env;
+    ScopeEnvironment newScope(environment, Environment::createNew(environment));
+    //auto previous = environment;
+    //try {
+    //    environment = env;
 
         for (auto& statement: statements) {
             execute(statement);
         }
-    } catch (...) {
-        environment = previous;
-    }
-    environment = previous; // @TODO change this bad code
+    //} catch (...) {
+    //    environment = previous;
+    //}
+    //environment = previous; // @TODO change this bad code
 }
 
 void Interpreter::visitBlockStmt(Block& stmt) {
-    auto env = std::make_shared<Environment>(environment); 
-    executeBlock(stmt.statements, env);
+    auto newEnv = std::make_shared<Environment>(environment); 
+    ScopeEnvironment newScope(environment, newEnv);
+    //executeBlock(stmt.statements, env);
+    for (auto& statement: stmt.statements) {
+        execute(statement);
+    }
 }
 
 

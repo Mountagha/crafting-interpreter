@@ -58,4 +58,12 @@ void Environment::assign(Token name, LoxObject value) {
 
 }
 
+ScopeEnvironment::ScopeEnvironment(PEnvironment& encl, PEnvironment newEnv) 
+    : backup_env{encl}, enclosing{encl} {
+        encl = newEnv;
+    }
+ScopeEnvironment::~ScopeEnvironment() {
+    enclosing = backup_env;
+}
+
 } // namespace lox

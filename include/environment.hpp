@@ -29,4 +29,13 @@ class Environment {
         std::unordered_map<std::string, LoxObject> values{}; 
 };
 
+class ScopeEnvironment {
+    public:
+        ScopeEnvironment(PEnvironment& encl, PEnvironment newEnv);
+        ~ScopeEnvironment();
+    private:
+        PEnvironment backup_env;
+        PEnvironment& enclosing;
+};
+
 } // namespace lox

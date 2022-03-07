@@ -30,6 +30,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void visitFunctionStmt(Function& stmt) override;
         void visitIfStmt(If& Stmt) override;
         void visitPrintStmt(Print& stmt) override;
+        void visitReturnStmt(Return& stmt) override;
         void visitVarStmt(Var& stmt) override;
         void visitBlockStmt(Block& stmt) override;
         void visitWhileStmt(While& stmt) override;

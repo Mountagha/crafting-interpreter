@@ -13,6 +13,7 @@ class Expression;
 class Function;
 class If;
 class Print;
+class Return;
 class Var;
 class While;
 
@@ -23,6 +24,7 @@ class StmtVisitor {
 		virtual void visitFunctionStmt( Function& stmt) = 0;
 		virtual void visitIfStmt( If& stmt) = 0;
 		virtual void visitPrintStmt( Print& stmt) = 0;
+		virtual void visitReturnStmt( Return& stmt) = 0;
 		virtual void visitVarStmt( Var& stmt) = 0;
 		virtual void visitWhileStmt( While& stmt) = 0;
 };
@@ -96,6 +98,19 @@ class Print: public Stmt {
 			visitor.visitPrintStmt(*this);
 		}
 		std::unique_ptr<Expr> expression;
+};
+
+class Return: public Stmt {
+	public:
+		Return(Token keyword_, std::unique_ptr<Expr>&& value_) {
+			keyword = keyword_;
+			value = std::move (value_);
+		}
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitReturnStmt(*this);
+		}
+		Token keyword;
+		std::unique_ptr<Expr> value;
 };
 
 class Var: public Stmt {

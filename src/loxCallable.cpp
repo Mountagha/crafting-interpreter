@@ -1,6 +1,7 @@
 #include "loxCallable.hpp"
 #include "interpreter.hpp"
 #include "environment.hpp"
+#include "return.hpp"
 
 
 namespace lox {
@@ -18,7 +19,12 @@ LoxObject LoxFunction::operator()(Interpreter& in, std::vector<LoxObject> args) 
     for (int i = 0; i < declaration->params.size(); i++) {
         environment->define(declaration->params[i].lexeme, args[i]);
     }
-    in.executeBlock(declaration->body, environment);
+    try {
+        in.executeBlock(declaration->body, environment);
+    } catch (ReturnExcept& returnValue) {
+        std::cout << "we here " << returnValue.get();
+        return returnValue.get();
+    }
 
     return LoxObject();
 }
