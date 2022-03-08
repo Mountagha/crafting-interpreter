@@ -88,18 +88,39 @@ fun add(a, b) {
 var res = add(1,2);
 print res;
 
+fun max(a, b) {
+  if (a > b) {
+    return a;
+  } else {
+    return b;
+  }
+}
+
+print "maximum of 5 and 9 is: ";
+print max(5, 9);
+
+fun fib(n) {
+  if (n <= 1) return n;
+  return fib(n -2) + fib(n-1);
+}
+
+for (var i = 0; i < 20; i = i + 1) {
+  print fib(i);
+}
+
 // closures
-//fun makeCounter() {
-//  var i = 0;
-//  fun count() {
-//    i = i + 1;
-//    print i;
-//  }
+fun makeCounter() {
+  var i = 0;
+  fun count() {
+    i = i + 1;
+    print i;
+  }
 
-//  return count;
-//}
+  return count;
+}
 
-//var counter = makeCounter();
-//counter(); // 1
-//counter(); // 2
+print "Experimenting closures";
+var counter = makeCounter();
+counter(); // 1
+counter(); // 2
 

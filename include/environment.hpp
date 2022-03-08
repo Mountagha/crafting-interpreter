@@ -30,6 +30,11 @@ class Environment {
 };
 
 class ScopeEnvironment {
+    /* 
+    This class allows us to handle the environments nesting by
+    backing up each time we enter a new block and restoring back 
+    when we exit 
+    */
     public:
         ScopeEnvironment(PEnvironment& encl, PEnvironment newEnv);
         ~ScopeEnvironment();

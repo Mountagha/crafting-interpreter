@@ -141,28 +141,16 @@ void Interpreter::visitWhileStmt(While& stmt) {
     
 }
 
-void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment env) {
-    ScopeEnvironment newScope(environment, Environment::createNew(environment));
-    //auto previous = environment;
-    //try {
-    //    environment = env;
-
-        for (auto& statement: statements) {
-            execute(statement);
-        }
-    //} catch (...) {
-    //    environment = previous;
-    //}
-    //environment = previous; // @TODO change this bad code
+void Interpreter::executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment newEnv) {
+    ScopeEnvironment newScope(environment, newEnv);
+    for (auto& statement: statements) {
+        execute(statement);
+    }
 }
 
 void Interpreter::visitBlockStmt(Block& stmt) {
     auto newEnv = std::make_shared<Environment>(environment); 
-    ScopeEnvironment newScope(environment, newEnv);
-    //executeBlock(stmt.statements, env);
-    for (auto& statement: stmt.statements) {
-        execute(statement);
-    }
+    executeBlock(stmt.statements, newEnv);
 }
 
 
