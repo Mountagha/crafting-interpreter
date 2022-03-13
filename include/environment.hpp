@@ -11,7 +11,7 @@ class Environment;
 using PEnvironment = std::shared_ptr<Environment>;
 
 
-class Environment {
+class Environment : public std::enable_shared_from_this<Environment>{
     public:
         Environment();
         Environment(PEnvironment enclosing);
@@ -19,6 +19,9 @@ class Environment {
         void assign(Token name, LoxObject value);
         static PEnvironment createNew(PEnvironment encl);
         static PEnvironment copy(PEnvironment env, PEnvironment encl);
+        LoxObject getAt(unsigned int distance, std::string name);
+        void assignAt(unsigned int distance, Token name, LoxObject value);
+        PEnvironment ancestor(unsigned int distance);
         PEnvironment copy();
 
         LoxObject get(Token name);   

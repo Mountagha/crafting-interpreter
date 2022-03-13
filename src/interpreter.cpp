@@ -10,6 +10,10 @@ Interpreter::Interpreter() {
     globals->define("clock", LoxObject(clock.get(), this));
 }
 
+void Interpreter::resolve(Expr* expr, unsigned int depth) {
+    locals[expr] = depth;
+}
+
 LoxObject Interpreter::visitLiteralExpr(Literal& expr) {
     return expr.value;
 }
@@ -85,11 +89,17 @@ LoxObject Interpreter::visitCallExpr(Call& expr) {
 }
 
 LoxObject Interpreter::visitVariableExpr(Variable& expr) {
-    return environment->get(expr.name);
+    return lookUpVariable(expr.name, &expr); 
 }
 
 LoxObject Interpreter::visitAssignExpr(Assign& expr) {
     LoxObject value = evaluate(expr.value);
+    unsigned int distance = locals[&expr];
+    if (!distance) {
+        globals->assign(expr.name, value);
+    } else {
+        environment->assignAt(distance, expr.name, value);
+    }
     environment->assign(expr.name, value);
     return value;
 }

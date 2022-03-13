@@ -27,6 +27,23 @@ void Environment::define(std::string s, LoxObject value) {
     values.insert_or_assign(s, value);
 }
 
+PEnvironment Environment::ancestor(unsigned int distance) {
+    auto environment = shared_from_this();
+    for (int i = 0; i < distance; i++) {
+        environment = environment->enclosing;
+    }
+    return environment;
+}
+
+LoxObject Environment::getAt(unsigned int distance, std::string name) {
+    return ancestor(distance)->values.at(name);
+}
+
+void Environment::assignAt(unsigned int distance, Token name, LoxObject value) {
+    ancestor(distance)->values.insert_or_assign(name.lexeme, value);
+}
+
+
 LoxObject Environment::get(Token name) {
     auto var = values.find(name.lexeme);
     if (var != values.end()) {

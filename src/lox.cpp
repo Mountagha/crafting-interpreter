@@ -7,6 +7,7 @@
 #include "parser.hpp"
 #include "ASTprinter.hpp"
 #include "interpreter.hpp"
+#include "resolver.hpp"
 
 namespace lox
 {
@@ -55,8 +56,14 @@ namespace lox
 
         //ASTprinter{}.print(expression);
 
-        // should be declared static to persist data accross different executions.
+        //static interpreter to persist data accross different executions.
         static Interpreter interpreter{};
+        Resolver resolver(&interpreter);
+
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
+        if (hadError) return;
         interpreter.interpret(statements);
          
     }

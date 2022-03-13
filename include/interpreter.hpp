@@ -8,6 +8,7 @@
 #include "Stmt.hpp"
 #include <iostream>
 #include <vector>
+#include <map>
 
 namespace lox {
 
@@ -37,11 +38,13 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
 
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
         void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
+        void resolve(Expr* expr, unsigned int depth);
     
     private:
 
         PEnvironment globals;
         PEnvironment environment;
+        std::map<Expr*, unsigned int> locals {};
 
         LoxObject evaluate(std::unique_ptr<Expr>& expr) {
             return expr->accept(*this);
@@ -49,6 +52,15 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
 
         void execute(std::unique_ptr<Stmt>& stmt) {
             stmt->accept(*this);
+        }
+
+        LoxObject lookUpVariable(Token name, Expr* expr) {
+            unsigned int distance = locals.at(expr);
+            if (distance != 0) {
+                return environment->getAt(distance, name.lexeme);
+            } else {
+                return globals->get(name);
+            }
         }
 
 
