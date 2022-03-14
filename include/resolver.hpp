@@ -148,17 +148,15 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         void declare(Token name) {
             if (scopes.empty()) return;
 
-            auto scope = scopes.back();
-            if (scope.find(name.lexeme) != scope.end()) {
+            if (scopes.back().find(name.lexeme) != scopes.back().end()) {
                 Lox::error(name, "Already a variable with this name in this scope.");
             }
-            scope[name.lexeme] = false;
+            scopes.back()[name.lexeme] = false;
         }
 
         void define(Token name) {
             if (scopes.empty()) return;
-            auto scope = scopes.back();
-            scope[name.lexeme] = true;
+            scopes.back()[name.lexeme] = true;
         }
 
         void resolveLocal(Expr& expr, Token name) {
