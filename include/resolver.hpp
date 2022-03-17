@@ -21,7 +21,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             }
         }
 
-        void visitBlockStmt(Block& stmt) {
+        void visitBlockStmt(Block& stmt) override {
             beginScope();
             resolve(stmt.statements);
             endScope();
@@ -35,7 +35,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             define(stmt.name);
         }
 
-        LoxObject visitVariableExpr(Variable& expr) {
+        LoxObject visitVariableExpr(Variable& expr) override {
             if (!scopes.empty() &&
                 scopes.back().find(expr.name.lexeme) != scopes.back().end() && 
                 scopes.back().at(expr.name.lexeme) == false) {
@@ -47,52 +47,52 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             return LoxObject();
         }
 
-        LoxObject visitAssignExpr(Assign& expr) {
+        LoxObject visitAssignExpr(Assign& expr) override {
             resolve(expr.value);
             resolveLocal(expr, expr.name);
             return LoxObject();
         }
 
-        void visitFunctionStmt(Function& stmt) {
+        void visitFunctionStmt(Function& stmt) override {
             declare(stmt.name);
             define(stmt.name);
 
             resolveFunction(stmt, FunctionType::FUNCTION);
         }
 
-        void visitExpressionStmt(Expression& stmt) {
+        void visitExpressionStmt(Expression& stmt) override {
             resolve(stmt.expression);
         }
 
-        void visitIfStmt(If& stmt) {
+        void visitIfStmt(If& stmt) override {
             resolve(stmt.condition);
             resolve(stmt.thenBranch);
             if (stmt.elseBranch) resolve(stmt.elseBranch);
         }
 
-        void visitPrintStmt(Print& stmt) {
+        void visitPrintStmt(Print& stmt) override {
             resolve(stmt.expression);
         }
 
-        void visitReturnStmt(Return& stmt) {
+        void visitReturnStmt(Return& stmt) override {
             if (currentFunction == FunctionType::NONE) {
                 Lox::error(stmt.keyword, "Cant return from top-level code.");
             }
             if (stmt.value) resolve(stmt.value);
         }
 
-        void visitWhileStmt(While& stmt) {
+        void visitWhileStmt(While& stmt) override {
             resolve(stmt.condition);
             resolve(stmt.body);
         }
 
-        LoxObject visitBinaryExpr(Binary& expr) {
+        LoxObject visitBinaryExpr(Binary& expr) override {
             resolve(expr.left);
             resolve(expr.right);
             return LoxObject();
         }
 
-        LoxObject visitCallExpr(Call& expr) {
+        LoxObject visitCallExpr(Call& expr) override {
             resolve(expr.callee);
             for (auto& arg : expr.arguments) {
                 resolve(arg);
@@ -100,22 +100,22 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             return LoxObject();
         }
 
-        LoxObject visitGroupingExpr(Grouping& expr) {
+        LoxObject visitGroupingExpr(Grouping& expr) override {
             resolve(expr.expression);
             return LoxObject();
         }
 
-        LoxObject visitLiteralExpr(Literal& expr) {
+        LoxObject visitLiteralExpr(Literal& expr) override {
             return LoxObject();
         }
 
-        LoxObject visitLogicalExpr(Logical& expr) {
+        LoxObject visitLogicalExpr(Logical& expr) override {
             resolve(expr.left);
             resolve(expr.right);
             return LoxObject();
         }
 
-        LoxObject visitUnaryExpr(Unary& expr) {
+        LoxObject visitUnaryExpr(Unary& expr) override {
             resolve(expr.right);
             return LoxObject();
         }

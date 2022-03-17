@@ -11,7 +11,7 @@ Interpreter::Interpreter() {
 }
 
 void Interpreter::resolve(Expr* expr, unsigned int depth) {
-    locals[expr] = depth;
+    locals.insert({expr, depth});
 }
 
 LoxObject Interpreter::visitLiteralExpr(Literal& expr) {
