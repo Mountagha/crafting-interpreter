@@ -57,9 +57,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         LoxObject lookUpVariable(Token name, Expr* expr) {
             if (locals.find(expr) != locals.end()) {
                 auto distance = locals.at(expr);
-                if (distance) {
-                    return environment->getAt(distance, name.lexeme);
-                }
+                return environment->getAt(distance, name.lexeme);
             } else {
                 return globals->get(name);
             }

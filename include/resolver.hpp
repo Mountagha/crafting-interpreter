@@ -133,8 +133,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             stmt->accept(*this);
         }
 
-        void resolve(PExpr& expr){
-            expr->accept(*this);
+        LoxObject resolve(PExpr& expr){
+            return expr->accept(*this);
         }
 
         void beginScope() {
