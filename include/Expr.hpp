@@ -10,9 +10,11 @@ namespace lox {
 class Assign;
 class Binary;
 class Call;
+class Get;
 class Grouping;
 class Literal;
 class Logical;
+class Set;
 class Unary;
 class Variable;
 
@@ -21,9 +23,11 @@ class ExprVisitor {
 		virtual LoxObject visitAssignExpr( Assign& expr) = 0;
 		virtual LoxObject visitBinaryExpr( Binary& expr) = 0;
 		virtual LoxObject visitCallExpr( Call& expr) = 0;
+		virtual LoxObject visitGetExpr( Get& expr) = 0;
 		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
 		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
 		virtual LoxObject visitLogicalExpr( Logical& expr) = 0;
+		virtual LoxObject visitSetExpr( Set& expr) = 0;
 		virtual LoxObject visitUnaryExpr( Unary& expr) = 0;
 		virtual LoxObject visitVariableExpr( Variable& expr) = 0;
 };
@@ -79,6 +83,19 @@ class Call: public Expr {
 		std::vector<std::unique_ptr<Expr>> arguments;
 };
 
+class Get: public Expr {
+	public:
+		Get(std::unique_ptr<Expr>&& object_, Token name_) {
+			object = std::move (object_);
+			name = name_;
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitGetExpr(*this);
+		}
+		std::unique_ptr<Expr> object;
+		Token name;
+};
+
 class Grouping: public Expr {
 	public:
 		Grouping(std::unique_ptr<Expr>&& expression_) {
@@ -114,6 +131,21 @@ class Logical: public Expr {
 		std::unique_ptr<Expr> left;
 		Token operator_;
 		std::unique_ptr<Expr> right;
+};
+
+class Set: public Expr {
+	public:
+		Set(std::unique_ptr<Expr>&& object_, Token name_, std::unique_ptr<Expr>&& value_) {
+			object = std::move (object_);
+			name = name_;
+			value = std::move (value_);
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitSetExpr(*this);
+		}
+		std::unique_ptr<Expr> object;
+		Token name;
+		std::unique_ptr<Expr> value;
 };
 
 class Unary: public Expr {

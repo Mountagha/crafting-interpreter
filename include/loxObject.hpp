@@ -13,6 +13,8 @@ enum class LoxType {
     Number,
     String,
     Callable,
+    Class,
+    Instance
 };
 
 inline bool operator<(LoxType a, LoxType b) {
@@ -21,6 +23,8 @@ inline bool operator<(LoxType a, LoxType b) {
 
 class Interpreter;
 class LoxCallable;
+class LoxClass;
+class LoxInstance;
 
 class LoxObject {
     public:
@@ -29,12 +33,17 @@ class LoxObject {
         explicit LoxObject(double d): lox_type(LoxType::Number), number{d} {}
         explicit LoxObject(std::string s): lox_type(LoxType::String), string{s} {}
         explicit LoxObject( LoxCallable* callable, Interpreter* in);
-        // add Callable later
+        explicit LoxObject( LoxClass* lk, Interpreter* in);
+        explicit LoxObject( LoxInstance* li, Interpreter* in);
 
         explicit LoxObject(Token token);
         LoxObject(const LoxObject&);
         LoxObject& operator=(const LoxObject& );
         ~LoxObject();
+
+        // Get, Set
+        LoxObject get(Token name);
+        LoxObject set(Token name, LoxObject value);
 
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args);
 
@@ -50,9 +59,6 @@ class LoxObject {
         LoxObject& operator*=(const LoxObject& o);
         LoxObject& operator/=(const LoxObject& o);
 
-        LoxObject get(Token name);
-        LoxObject set(Token name, LoxObject value);
-        
         operator std::string() const;
         operator double() const;
         operator bool() const;
@@ -65,11 +71,17 @@ class LoxObject {
         std::string string = "";
         LoxCallable* function = nullptr;
         Interpreter* interpreter = nullptr;
+        LoxClass* loxklass = nullptr;
+        LoxInstance* instance = nullptr;
+
 
         void cast(LoxType t) {
             if (t == lox_type) return;
             if (lox_type == LoxType::Callable) {
                 throw std::runtime_error("Cannot convert callable to non-callable");
+            }
+            if (t == LoxType::Class || t == LoxType::Instance) {
+                throw std::runtime_error("Cannot convert class to non-class");
             }
             switch(t) {
                 case LoxType::Nil: break;

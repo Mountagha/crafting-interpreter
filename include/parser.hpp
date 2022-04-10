@@ -48,7 +48,8 @@ class Parser {
 
             std::vector<std::unique_ptr<Function>> methods;
             while (!check(RIGHT_BRACE) && !isAtEnd()) {
-                methods.push_back(std::make_unique<Function>(function("method")));
+                auto m = function("method");
+                methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
             }
 
             consume(RIGHT_BRACE, "Expect '}' after class body.");
@@ -212,7 +213,10 @@ class Parser {
                 if (identifier.identify(expr) == Type::Variable) {
                     Token name = static_cast<Variable*>(expr.get())->name;
                     return std::make_unique<Assign>(name, std::move(value));
-                }
+                } else if (identifier.identify(expr) == Type::Get) {
+                    auto getExpr = std::unique_ptr<Get>(static_cast<Get*>(expr.release()));
+                    return std::make_unique<Set>(std::move(getExpr->object), getExpr->name, std::move(value));
+                } 
                 Lox::error(equals, "Invalid assigment target.");
             }
             return expr;
@@ -341,6 +345,10 @@ class Parser {
             while (true){
                 if (match ({LEFT_PAREN})) {
                     expr = finishCall(expr);
+                } else if (match ({DOT})) {
+                    Token name = consume(IDENTIFIER,
+                        "Expect propert name after '.'.");
+                    expr = std::make_unique<Get>(std::move(expr), name);
                 } else {
                     break;
                 }

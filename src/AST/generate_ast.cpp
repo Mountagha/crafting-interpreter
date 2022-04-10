@@ -166,10 +166,12 @@ int main(int argc, char *argv[]) {
     std::map<std::string, std::string> expr_map {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
         {"Call", "Expr* callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments"},
+        {"Get", "Expr* object, Token name"},
         {"Assign", "Token name, Expr* value"},
         {"Grouping", "Expr* expression"},
         {"Literal", "LoxObject value"},
         {"Logical", "Expr* left, Token operator_, Expr* right"},
+        {"Set", "Expr* object, Token name, Expr* value"},
         {"Unary", "Token operator_, Expr* right"},
         {"Variable", "Token name"}
     };

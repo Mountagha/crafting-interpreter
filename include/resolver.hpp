@@ -27,6 +27,12 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             endScope();
         }
 
+        void visitClassStmt(Class& stmt) {
+            declare(stmt.name);
+            define(stmt.name);
+
+        }
+
         void visitVarStmt(Var& stmt) override {
             declare(stmt.name);
             if (stmt.initializer) {
@@ -100,6 +106,11 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             return LoxObject();
         }
 
+        LoxObject visitGetExpr(Get& expr) override {
+            resolve(expr.object);
+            return LoxObject();
+        }
+
         LoxObject visitGroupingExpr(Grouping& expr) override {
             resolve(expr.expression);
             return LoxObject();
@@ -112,6 +123,12 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         LoxObject visitLogicalExpr(Logical& expr) override {
             resolve(expr.left);
             resolve(expr.right);
+            return LoxObject();
+        }
+
+        LoxObject visitSetExpr(Set& expr) override {
+            resolve(expr.value);
+            resolve(expr.object);
             return LoxObject();
         }
 

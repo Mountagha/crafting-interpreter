@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <chrono>
+#include <map>
 #include "loxObject.hpp"
 #include "Stmt.hpp"
 #include "environment.hpp"
@@ -41,7 +42,7 @@ class LoxFunction : public LoxCallable {
         LoxFunction(Function* declaration, PEnvironment encl);
         ~LoxFunction();
         size_t arity() const override { return declaration->params.size(); }
-        std::string name() const override { return "<fn " + declaration->name.lexeme + ">"; }
+        std::string name() const override { return "<fun " + declaration->name.lexeme + ">"; }
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
     
     private:
@@ -53,20 +54,25 @@ class LoxInstance;
 
 class LoxClass : public LoxCallable {
     public:
-        LoxClass(std::string n): class_name{n} {};
-        std::string name() const override { return "<class " + class_name + ">"; }
+        LoxClass(Token n): cname{n} {};
+        std::string name() const override { return "<class " + cname.lexeme + ">"; }
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
         size_t arity() const override { return 0; }
     private:
-        std::string class_name;
+        Token cname;
         friend class LoxInstance;
 };
 
 class LoxInstance {
     public:
-        LoxInstance(LoxClass klass_): klass{klass_} {}
+        LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
+        std::string name() const { return "<instance " + cname.lexeme + ">"; }
+        LoxObject get(Token name);
+        LoxObject set(Token name, LoxObject value);
     private:
-        LoxClass klass; 
+        LoxClass* klass; 
+        Token cname;
+        std::map<std::string, LoxObject> fields {};
 };
 
 } // lox namespace

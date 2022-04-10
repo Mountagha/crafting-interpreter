@@ -9,3 +9,10 @@ print a;
     }
     print a;
 }
+
+class DevonshireCream {
+    serveOn() {
+        return "Scones";
+    }
+}
+//Bagel();

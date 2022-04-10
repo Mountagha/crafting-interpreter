@@ -30,6 +30,12 @@ LoxObject Interpreter::visitLogicalExpr(Logical& expr) {
     return evaluate(expr.right);
 }
 
+LoxObject Interpreter::visitSetExpr(Set& expr) {
+    LoxObject object = evaluate(expr.object);
+    LoxObject value = evaluate(expr.value);
+    return object.set(expr.name, value);
+}
+
 LoxObject Interpreter::visitGroupingExpr(Grouping& expr) {
     return evaluate(expr.expression);
 }
@@ -86,6 +92,11 @@ LoxObject Interpreter::visitCallExpr(Call& expr) {
     }
 
     return callee(*this, arguments);
+}
+
+LoxObject Interpreter::visitGetExpr(Get& expr) {
+    LoxObject object = evaluate(expr.object);
+    return object.get(expr.name);
 }
 
 LoxObject Interpreter::visitVariableExpr(Variable& expr) {

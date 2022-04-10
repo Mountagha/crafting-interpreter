@@ -29,6 +29,23 @@ LoxObject LoxFunction::operator()(Interpreter& intp, std::vector<LoxObject> args
 }
 
 LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
-    std::cout << "class execution";    
+    // to implement
+    return LoxObject();    
 }
+
+LoxObject LoxInstance::get(Token name) {
+    auto value = fields.find(name.lexeme);
+    if (value != fields.end()) {
+        return value->second;
+    }
+    // maybe create later a custom runtimeError in order to print
+    // the line and/or the file along with the error message.
+    throw std::runtime_error("Undefined property '" + name.lexeme + "'.");
+}
+
+LoxObject LoxInstance::set(Token name, LoxObject value) {
+    return fields[name.lexeme] = value;
+}
+
+
 } // namespace lox

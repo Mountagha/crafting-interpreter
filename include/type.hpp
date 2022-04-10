@@ -7,7 +7,7 @@
 namespace lox {
 
 enum class Type {
-    Assign, Binary, Grouping, Literal, Unary, Variable, Logical, Call,
+    Assign, Binary, Grouping, Literal, Unary, Variable, Logical, Call, Get, Set,
     Expression, If, Print, Var, Block, While, Function, Return, Class
 };
 
@@ -51,6 +51,12 @@ class TypeIdentifier : public StmtVisitor, public ExprVisitor {
         }
         LoxObject visitCallExpr(Call& expr) override {
             type = Type::Call; return LoxObject();
+        }
+        LoxObject visitGetExpr(Get& expr) override {
+            type = Type::Get; return LoxObject();
+        }
+        LoxObject visitSetExpr(Set& expr) override {
+            type = Type::Set; return LoxObject();
         }
 
         void visitExpressionStmt(Expression& stmt) override {

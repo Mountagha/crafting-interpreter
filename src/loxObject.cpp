@@ -9,12 +9,20 @@ namespace lox {
 LoxObject::LoxObject(LoxCallable* callable, Interpreter* in) 
     : function{callable}, interpreter{in}, lox_type{LoxType::Callable} {}
 
+LoxObject::LoxObject(LoxInstance* li, Interpreter* in) 
+    : instance{li}, interpreter{in}, lox_type{LoxType::Instance} {}
+
+LoxObject::LoxObject(LoxClass* lk, Interpreter* in)
+    : loxklass{lk}, interpreter{in}, lox_type{LoxType::Class} {}
+
 LoxObject::LoxObject(const LoxObject& o){
     string = o.string;
     number = o.number;
     lox_type = o.lox_type;
     boolean = o.boolean;
     function = o.function;
+    instance = o.instance;
+    loxklass = o.loxklass;
     interpreter = o.interpreter;
 }
 
@@ -24,11 +32,27 @@ LoxObject& LoxObject::operator=(const LoxObject& o){
     lox_type = o.lox_type;
     boolean = o.boolean;
     function = o.function;
+    instance = o.instance;
+    loxklass = o.loxklass;
     interpreter = o.interpreter;
     return *this;
 }
 
 LoxObject::~LoxObject() {} // nothing for now.
+
+LoxObject LoxObject::get(Token name) {
+    if (lox_type != LoxType::Instance) {
+        throw std::runtime_error("Cannot get property from a non-class instance");
+    }
+    return instance->get(name);
+}
+
+LoxObject LoxObject::set(Token name, LoxObject value) {
+    if (lox_type != LoxType::Instance) {
+        throw std::runtime_error("Cannot set property on non-class instance.");
+    }
+    return instance->set(name, value);
+}
 
 LoxObject LoxObject::operator()(Interpreter& in, std::vector<LoxObject> args) {
     if (lox_type != LoxType::Callable) {
@@ -87,7 +111,12 @@ LoxObject::operator std::string() const {
         }
 
         case LoxType::String: return string;
-        // handle other types later
+        case LoxType::Callable:
+            return function->name();
+        case LoxType::Class:
+            return loxklass->name();
+        case LoxType::Instance:
+            return instance->name();
     }
     throw std::runtime_error("Could not convert object to string");
 }
@@ -106,8 +135,10 @@ LoxObject::operator double() const {
             if (ss.fail() || ss.bad()) throw std::runtime_error("Bad cast.");
             return num;
         }
-        // handle other types later
-
+        case LoxType::Callable:
+        case LoxType::Class:
+        case LoxType::Instance:
+            break;
     }
     throw std::runtime_error("Could not convert object to number");
 }
@@ -118,7 +149,10 @@ LoxObject::operator bool() const {
         case LoxType::Bool: return boolean;
         case LoxType::Number: return number != 0.;
         case LoxType::String: return string != "";
-        // handle other types later
+        case LoxType::Callable:
+        case LoxType::Class:
+        case LoxType::Instance:
+            return true;
     }
 
     throw std::runtime_error("Could not convert object to bool.");
