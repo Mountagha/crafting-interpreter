@@ -49,4 +49,24 @@ class LoxFunction : public LoxCallable {
         PEnvironment enclosing;
 };
 
-}
+class LoxInstance;
+
+class LoxClass : public LoxCallable {
+    public:
+        LoxClass(std::string n): class_name{n} {};
+        std::string name() const override { return "<class " + class_name + ">"; }
+        LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
+        size_t arity() const override { return 0; }
+    private:
+        std::string class_name;
+        friend class LoxInstance;
+};
+
+class LoxInstance {
+    public:
+        LoxInstance(LoxClass klass_): klass{klass_} {}
+    private:
+        LoxClass klass; 
+};
+
+} // lox namespace

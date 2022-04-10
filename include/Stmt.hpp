@@ -9,6 +9,7 @@
 namespace lox { 
 
 class Block;
+class Class;
 class Expression;
 class Function;
 class If;
@@ -20,6 +21,7 @@ class While;
 class StmtVisitor {
 	public:
 		virtual void visitBlockStmt( Block& stmt) = 0;
+		virtual void visitClassStmt( Class& stmt) = 0;
 		virtual void visitExpressionStmt( Expression& stmt) = 0;
 		virtual void visitFunctionStmt( Function& stmt) = 0;
 		virtual void visitIfStmt( If& stmt) = 0;
@@ -46,6 +48,19 @@ class Block: public Stmt {
 			visitor.visitBlockStmt(*this);
 		}
 		std::vector<std::unique_ptr<Stmt>> statements;
+};
+
+class Class: public Stmt {
+	public:
+		Class(Token name_, std::vector<std::unique_ptr<Function>>&& methods_) {
+			name = name_;
+			methods = std::move (methods_);
+		}
+		void accept(StmtVisitor& visitor) override {
+			visitor.visitClassStmt(*this);
+		}
+		Token name;
+		std::vector<std::unique_ptr<Function>> methods;
 };
 
 class Expression: public Stmt {

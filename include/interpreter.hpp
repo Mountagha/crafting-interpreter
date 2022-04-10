@@ -35,6 +35,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void visitVarStmt(Var& stmt) override;
         void visitBlockStmt(Block& stmt) override;
         void visitWhileStmt(While& stmt) override;
+        void visitClassStmt(Class& stmt) override;
 
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
         void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 

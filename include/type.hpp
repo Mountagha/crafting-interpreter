@@ -8,7 +8,7 @@ namespace lox {
 
 enum class Type {
     Assign, Binary, Grouping, Literal, Unary, Variable, Logical, Call,
-    Expression, If, Print, Var, Block, While, Function, Return,
+    Expression, If, Print, Var, Block, While, Function, Return, Class
 };
 
 class TypeIdentifier : public StmtVisitor, public ExprVisitor {
@@ -76,6 +76,9 @@ class TypeIdentifier : public StmtVisitor, public ExprVisitor {
         } 
         void visitReturnStmt(Return& stmt) override {
             type = Type::Return;
+        }
+        void visitClassStmt(Class& stmt) override {
+            type = Type::Class;
         } 
 
 

@@ -94,13 +94,12 @@ LoxObject Interpreter::visitVariableExpr(Variable& expr) {
 
 LoxObject Interpreter::visitAssignExpr(Assign& expr) {
     LoxObject value = evaluate(expr.value);
-    unsigned int distance = locals[&expr];
-    if (!distance) {
-        globals->assign(expr.name, value);
-    } else {
+    if (locals.find(&expr) != locals.end()) {
+        unsigned int distance = locals[&expr];
         environment->assignAt(distance, expr.name, value);
+    } else {
+        globals->assign(expr.name, value);
     }
-    environment->assign(expr.name, value);
     return value;
 }
 
@@ -163,7 +162,9 @@ void Interpreter::visitBlockStmt(Block& stmt) {
     executeBlock(stmt.statements, newEnv);
 }
 
-
+void Interpreter::visitClassStmt(Class& stmt) {
+    environment->define(stmt.name.lexeme, LoxObject());
+}
 
 void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements) {
     try

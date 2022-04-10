@@ -31,6 +31,7 @@ class Parser {
 
         SExpr declaration() {
             try {
+                if (match ({CLASS})) return classDeclaration();
                 if (match ({FUN})) return function("function");
                 if (match ({VAR})) return varDeclaration();
 
@@ -39,6 +40,20 @@ class Parser {
                 synchronize();
                 return SExpr{};
             }
+        }
+
+        SExpr classDeclaration() {
+            Token name = consume(IDENTIFIER, "Expect class name.");
+            consume(LEFT_BRACE, "Expect '{' before class body.");
+
+            std::vector<std::unique_ptr<Function>> methods;
+            while (!check(RIGHT_BRACE) && !isAtEnd()) {
+                methods.push_back(std::make_unique<Function>(function("method")));
+            }
+
+            consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+            return std::make_unique<Class>(name, std::move(methods));
         }
 
         SExpr statement() {

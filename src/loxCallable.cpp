@@ -27,4 +27,8 @@ LoxObject LoxFunction::operator()(Interpreter& intp, std::vector<LoxObject> args
 
     return LoxObject();
 }
+
+LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
+    std::cout << "class execution";    
+}
 } // namespace lox
