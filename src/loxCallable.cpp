@@ -29,7 +29,7 @@ LoxObject LoxFunction::operator()(Interpreter& intp, std::vector<LoxObject> args
 }
 
 LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
-    // to implement
+    // to implement later
     return LoxObject();    
 }
 
