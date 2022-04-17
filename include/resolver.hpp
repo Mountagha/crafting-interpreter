@@ -31,6 +31,11 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             declare(stmt.name);
             define(stmt.name);
 
+            for (auto& method: stmt.methods) {
+                FunctionType declaration = FunctionType::METHOD;
+                resolveFunction(*method, declaration); // not sure if this is a good practice.
+            }
+
         }
 
         void visitVarStmt(Var& stmt) override {
@@ -140,7 +145,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
     private:
         enum class FunctionType {
             NONE,
-            FUNCTION
+            FUNCTION,
+            METHOD
         };
         FunctionType currentFunction {FunctionType::NONE};
         Interpreter* interpreter;

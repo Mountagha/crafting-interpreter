@@ -120,7 +120,7 @@ void Interpreter::visitExpressionStmt(Expression& stmt) {
 }
 
 void Interpreter::visitFunctionStmt(Function& stmt) {
-    LoxCallable* function {static_cast<LoxCallable*>(new LoxFunction(&stmt, environment))};
+    LoxCallable* function {static_cast<LoxCallable*>(new LoxFunction(&stmt, environment))}; // possible leak (never freed)
     environment->define(stmt.name.lexeme, LoxObject(function, this));
 }
 
@@ -175,6 +175,9 @@ void Interpreter::visitBlockStmt(Block& stmt) {
 
 void Interpreter::visitClassStmt(Class& stmt) {
     environment->define(stmt.name.lexeme, LoxObject());
+    LoxClass* classy = new LoxClass(&stmt, this, environment); // possible leak here. not freed.
+
+    environment->assign(stmt.name, LoxObject(classy, this));
 }
 
 void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements) {
