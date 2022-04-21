@@ -58,6 +58,15 @@ LoxObject LoxObject::operator()(Interpreter& in, std::vector<LoxObject> args) {
     if (lox_type != LoxType::Callable) {
         std::runtime_error("Cannot call non-callable");
     }
+    if (lox_type == LoxType::Class) {
+        if (args.size() != loxklass->arity()) {
+            std::string msg = "Function argument count mismatch. Expected " 
+                + std::to_string(loxklass->arity()) + ", got " 
+                + std::to_string(args.size()) + "\n";
+            throw std::runtime_error(msg);
+        }
+        return (*loxklass)(in, args);
+    }
     if (args.size() != function->arity()){
         std::string msg = "Function argument count mismatch. Expected "
             + std::to_string(function->arity()) + ", got" 

@@ -41,7 +41,9 @@ LoxObject LoxClass::findMethod(std::string name) {
     if (var != methods.end()) {
         return var->second;
     }
-     throw std::runtime_error("Undefined property '" + name + "'.");
+    throw std::runtime_error("Undefined property '" + name + "'.");
+    // maybe create later a custom runtimeError in order to print
+    // the line and/or the file along with the error message.
 }
 
 LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
@@ -55,10 +57,6 @@ LoxObject LoxInstance::get(Token name) {
         return value->second;
     }
     return klass->findMethod(name.lexeme);
-    
-    // maybe create later a custom runtimeError in order to print
-    // the line and/or the file along with the error message.
-   
 }
 
 LoxObject LoxInstance::set(Token name, LoxObject value) {

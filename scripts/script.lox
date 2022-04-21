@@ -136,3 +136,10 @@ var a = "global";
   showA();
 }
 
+class Bacon {
+  eat() {
+    print "Crunch Crunch Crunch";
+  }
+}
+
+Bacon().eat();
