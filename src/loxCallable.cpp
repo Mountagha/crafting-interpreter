@@ -36,10 +36,15 @@ LoxClass::LoxClass(Class* stmt, Interpreter* intp, PEnvironment encl) {
     }
 }
 
-LoxObject LoxClass::findMethod(std::string name) {
+LoxObject LoxClass::function(std::string name, LoxInstance* instance) {
+    // possible leak in this function. Check later.
     auto var = methods.find(name);
     if (var != methods.end()) {
-        return var->second;
+        LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction());
+        PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
+        environment->define("this", LoxObject(instance, interpreter));
+        LoxCallable* new_method {static_cast<LoxCallable*>(new LoxFunction(func->getDeclaration(), environment))}; 
+        return LoxObject(new_method, interpreter);
     }
     throw std::runtime_error("Undefined property '" + name + "'.");
     // maybe create later a custom runtimeError in order to print
@@ -56,7 +61,7 @@ LoxObject LoxInstance::get(Token name) {
     if (value != fields.end()) {
         return value->second;
     }
-    return klass->findMethod(name.lexeme);
+    return klass->function(name.lexeme, this);
 }
 
 LoxObject LoxInstance::set(Token name, LoxObject value) {

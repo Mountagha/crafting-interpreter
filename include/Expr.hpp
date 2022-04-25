@@ -15,6 +15,7 @@ class Grouping;
 class Literal;
 class Logical;
 class Set;
+class This;
 class Unary;
 class Variable;
 
@@ -28,6 +29,7 @@ class ExprVisitor {
 		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
 		virtual LoxObject visitLogicalExpr( Logical& expr) = 0;
 		virtual LoxObject visitSetExpr( Set& expr) = 0;
+		virtual LoxObject visitThisExpr( This& expr) = 0;
 		virtual LoxObject visitUnaryExpr( Unary& expr) = 0;
 		virtual LoxObject visitVariableExpr( Variable& expr) = 0;
 };
@@ -146,6 +148,17 @@ class Set: public Expr {
 		std::unique_ptr<Expr> object;
 		Token name;
 		std::unique_ptr<Expr> value;
+};
+
+class This: public Expr {
+	public:
+		This(Token keyword_) {
+			keyword = keyword_;
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitThisExpr(*this);
+		}
+		Token keyword;
 };
 
 class Unary: public Expr {

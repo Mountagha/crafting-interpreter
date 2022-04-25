@@ -376,6 +376,8 @@ class Parser {
             if (match({FALSE})) return std::make_unique<Literal>(LoxObject(false));
             if (match({TRUE})) return std::make_unique<Literal>(LoxObject(true));
             if (match({NIL})) return std::make_unique<Literal>(LoxObject());
+
+            if (match({THIS})) return std::make_unique<This>(previous());
             
             if (match({IDENTIFIER})) return std::make_unique<Variable>(previous());
 

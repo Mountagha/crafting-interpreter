@@ -36,6 +36,10 @@ LoxObject Interpreter::visitSetExpr(Set& expr) {
     return object.set(expr.name, value);
 }
 
+LoxObject Interpreter::visitThisExpr(This& expr) {
+    return lookUpVariable(expr.keyword, &expr);
+}
+
 LoxObject Interpreter::visitGroupingExpr(Grouping& expr) {
     return evaluate(expr.expression);
 }

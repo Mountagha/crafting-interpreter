@@ -44,6 +44,14 @@ class LoxFunction : public LoxCallable {
         size_t arity() const override { return declaration->params.size(); }
         std::string name() const override { return "<fun " + declaration->name.lexeme + ">"; }
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
+
+        // Needed getters & setters
+        PEnvironment getEnclosing() {
+            return enclosing;
+        }
+        Function* getDeclaration() {
+            return declaration;
+        }
     
     private:
         Function* declaration;
@@ -57,9 +65,10 @@ class LoxClass : public LoxCallable {
         LoxClass(Class* stmt, Interpreter* intp, PEnvironment encl);
         std::string name() const override { return "<class " + cname.lexeme + ">"; }
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
-        LoxObject findMethod(std::string name);
+        LoxObject function(std::string name, LoxInstance* instance);
         size_t arity() const override { return 0; }
     private:
+        Interpreter* interpreter;
         Token cname;
         std::map<std::string, LoxObject> methods {};
         friend class LoxInstance;

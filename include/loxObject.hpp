@@ -63,6 +63,11 @@ class LoxObject {
         operator double() const;
         operator bool() const;
 
+        // needed getters and setters
+        LoxCallable* getFunction() {
+            return function;
+        }
+
 
     private:
         LoxType lox_type = LoxType::Nil;

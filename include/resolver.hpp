@@ -28,13 +28,22 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         }
 
         void visitClassStmt(Class& stmt) {
+            ClassType enclosingClass = currentClass;
+            currentClass = ClassType::CLASS;
+
             declare(stmt.name);
             define(stmt.name);
+
+            beginScope();
+            scopes.back()["this"] = true;
 
             for (auto& method: stmt.methods) {
                 FunctionType declaration = FunctionType::METHOD;
                 resolveFunction(*method, declaration); // not sure if this is a good practice.
             }
+
+            endScope();
+            currentClass = enclosingClass;
 
         }
 
@@ -137,17 +146,32 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             return LoxObject();
         }
 
+        LoxObject visitThisExpr(This& expr) override {
+            if (currentClass == ClassType::NONE) {
+                Lox::error(expr.keyword, "Can't use 'this' outside of a class.");
+            }
+            resolveLocal(expr, expr.keyword);
+            return LoxObject();
+        }
+
         LoxObject visitUnaryExpr(Unary& expr) override {
             resolve(expr.right);
             return LoxObject();
         }
 
     private:
+        enum class ClassType {
+            NONE,
+            CLASS
+        };
+
         enum class FunctionType {
             NONE,
             FUNCTION,
             METHOD
         };
+        
+        ClassType currentClass {ClassType::NONE};
         FunctionType currentFunction {FunctionType::NONE};
         Interpreter* interpreter;
         std::vector<std::map<std::string, bool>> scopes {};
