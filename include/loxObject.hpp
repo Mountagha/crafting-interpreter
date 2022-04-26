@@ -64,8 +64,12 @@ class LoxObject {
         operator bool() const;
 
         // needed getters and setters
-        LoxCallable* getFunction() {
+        LoxCallable* getFunction() const {
             return function;
+        }
+
+        LoxInstance* getInstance() const {
+            return instance;
         }
 
 

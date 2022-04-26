@@ -39,6 +39,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
 
             for (auto& method: stmt.methods) {
                 FunctionType declaration = FunctionType::METHOD;
+                if (method->name.lexeme == "init") {
+                    declaration = FunctionType::INITIALIZER;
+                }
                 resolveFunction(*method, declaration); // not sure if this is a good practice.
             }
 
@@ -98,7 +101,12 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             if (currentFunction == FunctionType::NONE) {
                 Lox::error(stmt.keyword, "Cant return from top-level code.");
             }
-            if (stmt.value) resolve(stmt.value);
+            if (stmt.value) {
+                if (currentFunction == FunctionType::INITIALIZER) {
+                    Lox::error(stmt.keyword, "Can't return a value from an initlializer.");
+                }
+                resolve(stmt.value);
+            } 
         }
 
         void visitWhileStmt(While& stmt) override {
@@ -168,6 +176,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         enum class FunctionType {
             NONE,
             FUNCTION,
+            INITIALIZER,
             METHOD
         };
         

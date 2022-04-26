@@ -6,10 +6,10 @@
 
 namespace lox {
 
-LoxFunction::LoxFunction(Function* decl, std::shared_ptr<Environment> encl) {
+LoxFunction::LoxFunction(Function* decl, std::shared_ptr<Environment> encl, bool isInit) {
     declaration = decl;
     enclosing = encl;
-
+    isInitializer = isInit;
 }
 
 LoxFunction::~LoxFunction() { /* handle later */ }
@@ -22,6 +22,7 @@ LoxObject LoxFunction::operator()(Interpreter& intp, std::vector<LoxObject> args
     try {
         intp.executeBlock(declaration->body, environment);
     } catch (ReturnExcept& returnValue) {
+        if (isInitializer) return enclosing->getAt(0, "this");
         return returnValue.get();
     }
 
@@ -30,8 +31,10 @@ LoxObject LoxFunction::operator()(Interpreter& intp, std::vector<LoxObject> args
 
 LoxClass::LoxClass(Class* stmt, Interpreter* intp, PEnvironment encl) {
     cname = stmt->name;
+    bool isInit {false};
     for (auto& m: stmt->methods) {
-        LoxCallable* method {static_cast<LoxCallable*>(new LoxFunction(m.get(), encl))}; // possible leak with get maybe 
+        isInit = m->name.lexeme == "init" ? true : false;
+        LoxCallable* method {static_cast<LoxCallable*>(new LoxFunction(m.get(), encl, isInit))}; // possible leak with get maybe 
         methods[m->name.lexeme] = LoxObject(method, intp);
     }
 }
@@ -52,8 +55,26 @@ LoxObject LoxClass::function(std::string name, LoxInstance* instance) {
 }
 
 LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
+
+    if (&intp != interpreter) {
+        std::runtime_error("class constructed in different interpreter.");
+    }
+
     LoxInstance* instance = new LoxInstance(this);  // possible leak here. not freed
-    return LoxObject(instance, &intp);
+    auto instance_object = LoxObject(instance, &intp);
+    if (methods.find("init") != methods.end()) {
+        // we are giving the line of the token 0 cause we don't care. We just want to retrieve the init method using its name. 
+        instance_object.getInstance()->get({IDENTIFIER, "init", 0})(intp, args);
+    }
+    return instance_object;  
+}
+
+size_t LoxClass::arity() const {
+    auto init_method = methods.find("init");
+    if (init_method != methods.end()) {
+        return init_method->second.getFunction()->arity();
+    }
+    return 0;
 }
 
 LoxObject LoxInstance::get(Token name) {
