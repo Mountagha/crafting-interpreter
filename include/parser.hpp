@@ -44,6 +44,13 @@ class Parser {
 
         SExpr classDeclaration() {
             Token name = consume(IDENTIFIER, "Expect class name.");
+            // handle inheritance
+            PExpr superclass;
+            if (match({LESS})) {
+                consume(IDENTIFIER, "Expect superclass name.");
+                superclass = std::make_unique<Variable>(previous());
+            }
+
             consume(LEFT_BRACE, "Expect '{' before class body.");
 
             std::vector<std::unique_ptr<Function>> methods;
@@ -54,7 +61,7 @@ class Parser {
 
             consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-            return std::make_unique<Class>(name, std::move(methods));
+            return std::make_unique<Class>(name, std::move(superclass), std::move(methods));
         }
 
         SExpr statement() {

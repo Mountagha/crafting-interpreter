@@ -178,8 +178,16 @@ void Interpreter::visitBlockStmt(Block& stmt) {
 }
 
 void Interpreter::visitClassStmt(Class& stmt) {
+    
+    LoxObject superclass;
+    if (stmt.superclass) {
+        superclass = evaluate(stmt.superclass);
+        if (superclass.getLoxObjectType() != LoxType::Class) {
+            throw std::runtime_error("Superclass must be a class.");
+        }
+    }
     environment->define(stmt.name.lexeme, LoxObject());
-    LoxClass* classy = new LoxClass(&stmt, this, environment); // possible leak here. not freed.
+    LoxClass* classy = new LoxClass(&stmt, superclass.getLoxClass(), this, environment); // possible leak here. not freed.
 
     environment->assign(stmt.name, LoxObject(classy, this));
 }

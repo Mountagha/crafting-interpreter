@@ -72,6 +72,14 @@ class LoxObject {
             return instance;
         }
 
+        LoxType getLoxObjectType() const {
+            return lox_type;
+        }
+
+        LoxClass* getLoxClass() const {
+            return loxklass;
+        }
+
 
     private:
         LoxType lox_type = LoxType::Nil;

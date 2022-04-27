@@ -29,9 +29,12 @@ LoxObject LoxFunction::operator()(Interpreter& intp, std::vector<LoxObject> args
     return LoxObject();
 }
 
-LoxClass::LoxClass(Class* stmt, Interpreter* intp, PEnvironment encl) {
+LoxClass::LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnvironment encl) {
     cname = stmt->name;
+    super = superClass;
+    interpreter = intp;
     bool isInit {false};
+
     for (auto& m: stmt->methods) {
         isInit = m->name.lexeme == "init" ? true : false;
         LoxCallable* method {static_cast<LoxCallable*>(new LoxFunction(m.get(), encl, isInit))}; // possible leak with get maybe 
@@ -39,9 +42,9 @@ LoxClass::LoxClass(Class* stmt, Interpreter* intp, PEnvironment encl) {
     }
 }
 
-LoxObject LoxClass::function(std::string name, LoxInstance* instance) {
+LoxObject LoxClass::function(Token name, LoxInstance* instance) {
     // possible leak in this function. Check later.
-    auto var = methods.find(name);
+    auto var = methods.find(name.lexeme);
     if (var != methods.end()) {
         LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction());
         PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
@@ -49,7 +52,8 @@ LoxObject LoxClass::function(std::string name, LoxInstance* instance) {
         LoxCallable* new_method {static_cast<LoxCallable*>(new LoxFunction(func->getDeclaration(), environment))}; 
         return LoxObject(new_method, interpreter);
     }
-    throw std::runtime_error("Undefined property '" + name + "'.");
+    if (super) return super->function(name, instance); 
+    throw std::runtime_error("Undefined property '" + name.lexeme + "'.");
     // maybe create later a custom runtimeError in order to print
     // the line and/or the file along with the error message.
 }
@@ -82,7 +86,7 @@ LoxObject LoxInstance::get(Token name) {
     if (value != fields.end()) {
         return value->second;
     }
-    return klass->function(name.lexeme, this);
+    return klass->function(name, this);
 }
 
 LoxObject LoxInstance::set(Token name, LoxObject value) {

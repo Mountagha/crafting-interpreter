@@ -19,3 +19,13 @@ class Cake {
 var cake = Cake();
 cake.flavor = "German chocolate";
 cake.taste(); // should print "the German chocolate cake is delicious!"
+
+class Doughnut {
+    cook() {
+        print "Fry until golden brown";
+    }
+}
+
+class BostonCream < Doughnut {}
+
+BostonCream().cook();

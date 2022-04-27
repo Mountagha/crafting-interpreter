@@ -34,6 +34,17 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             declare(stmt.name);
             define(stmt.name);
 
+            // Resolve possible superclass
+            if (stmt.superclass) {
+                
+                auto superclassName = static_cast<Variable*>(stmt.superclass.get())->name;
+                if (stmt.superclass && (stmt.name.lexeme == superclassName.lexeme)) {
+                    Lox::error(superclassName, "A class can't inherit from itself.");
+                }
+
+                resolve(stmt.superclass);
+            }
+
             beginScope();
             scopes.back()["this"] = true;
 

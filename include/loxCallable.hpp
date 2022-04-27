@@ -63,13 +63,14 @@ class LoxInstance;
 
 class LoxClass : public LoxCallable {
     public:
-        LoxClass(Class* stmt, Interpreter* intp, PEnvironment encl);
+        LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnvironment encl);
         std::string name() const override { return "<class " + cname.lexeme + ">"; }
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
-        LoxObject function(std::string name, LoxInstance* instance);
+        LoxObject function(Token name, LoxInstance* instance);
         size_t arity() const override;
     private:
         Interpreter* interpreter;
+        LoxClass* super;
         Token cname;
         std::map<std::string, LoxObject> methods {};
         friend class LoxInstance;
