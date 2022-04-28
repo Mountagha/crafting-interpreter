@@ -36,6 +36,13 @@ LoxObject Interpreter::visitSetExpr(Set& expr) {
     return object.set(expr.name, value);
 }
 
+LoxObject Interpreter::visitSuperExpr(Super& expr) {
+    auto distance = locals[&expr];
+    auto superclass = environment->getAt(distance, "super");
+    auto object = environment->getAt(distance - 1, "this");
+    return superclass.getLoxClass()->function(expr.method, object.getInstance());
+}
+
 LoxObject Interpreter::visitThisExpr(This& expr) {
     return lookUpVariable(expr.keyword, &expr);
 }
@@ -187,7 +194,17 @@ void Interpreter::visitClassStmt(Class& stmt) {
         }
     }
     environment->define(stmt.name.lexeme, LoxObject());
+
+    if(stmt.superclass) {
+        environment = std::make_shared<Environment>(environment);
+        environment->define("super", superclass);
+        // will allow methods closure to capture environment containing super.  
+    }
     LoxClass* classy = new LoxClass(&stmt, superclass.getLoxClass(), this, environment); // possible leak here. not freed.
+
+    if (superclass.getLoxObjectType() != LoxType::Nil) {
+        environment = environment->enclosing;
+    }
 
     environment->assign(stmt.name, LoxObject(classy, this));
 }

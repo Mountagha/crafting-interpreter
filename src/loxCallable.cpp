@@ -46,7 +46,7 @@ LoxObject LoxClass::function(Token name, LoxInstance* instance) {
     // possible leak in this function. Check later.
     auto var = methods.find(name.lexeme);
     if (var != methods.end()) {
-        LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction());
+        LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction()); // possible leak ?
         PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
         environment->define("this", LoxObject(instance, interpreter));
         LoxCallable* new_method {static_cast<LoxCallable*>(new LoxFunction(func->getDeclaration(), environment))}; 

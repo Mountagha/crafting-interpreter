@@ -172,6 +172,7 @@ int main(int argc, char *argv[]) {
         {"Literal", "LoxObject value"},
         {"Logical", "Expr* left, Token operator_, Expr* right"},
         {"Set", "Expr* object, Token name, Expr* value"},
+        {"Super", "Token keyword, Token method"},
         {"This", "Token keyword"},
         {"Unary", "Token operator_, Expr* right"},
         {"Variable", "Token name"}

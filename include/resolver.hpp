@@ -42,7 +42,14 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                     Lox::error(superclassName, "A class can't inherit from itself.");
                 }
 
+                currentClass = ClassType::SUBCLASS;
+
                 resolve(stmt.superclass);
+            }
+
+            if (stmt.superclass) {
+                beginScope();
+                scopes.back()["super"] = true;
             }
 
             beginScope();
@@ -57,6 +64,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             }
 
             endScope();
+
+            if (stmt.superclass) endScope();
             currentClass = enclosingClass;
 
         }
@@ -165,6 +174,16 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             return LoxObject();
         }
 
+        LoxObject visitSuperExpr(Super& expr) {
+            if (currentClass == ClassType::NONE) {
+                Lox::error(expr.keyword, "Can't use 'super' outside of a class.");
+            } else if (currentClass != ClassType::SUBCLASS) {
+                Lox::error(expr.keyword, "Can't use 'super' in a class with no super class.");
+            }
+            resolveLocal(expr, expr.keyword);
+            return LoxObject();
+        }
+
         LoxObject visitThisExpr(This& expr) override {
             if (currentClass == ClassType::NONE) {
                 Lox::error(expr.keyword, "Can't use 'this' outside of a class.");
@@ -181,7 +200,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
     private:
         enum class ClassType {
             NONE,
-            CLASS
+            CLASS,
+            SUBCLASS
         };
 
         enum class FunctionType {

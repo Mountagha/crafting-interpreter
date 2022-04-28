@@ -27,6 +27,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         LoxObject visitCallExpr(Call& expr) override;
         LoxObject visitGetExpr(Get& expr) override;
         LoxObject visitSetExpr(Set& expr) override;
+        LoxObject visitSuperExpr(Super& expr) override;
         LoxObject visitThisExpr(This& expr) override;
 
         // Stmt

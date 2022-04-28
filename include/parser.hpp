@@ -397,6 +397,13 @@ class Parser {
                 return std::make_unique<Grouping>(std::move(expr));
             }
 
+            if (match({SUPER})) {
+                Token keyword = previous();
+                consume(DOT, "Expect '.' after 'super'.");
+                Token method = consume(IDENTIFIER, "Expect superclass method name.");
+                return std::make_unique<Super>(keyword, method);
+            }
+
             throw error(peek(), "Expect expression.");
         }
 
