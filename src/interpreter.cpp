@@ -6,8 +6,10 @@ namespace lox {
 Interpreter::Interpreter() {
     globals = std::make_shared<Environment>();
     environment = globals;
-    std::unique_ptr<LoxCallable> clock {static_cast<LoxCallable*>(new TimeFunction())}; 
-    globals->define("clock", LoxObject(clock.get(), this));
+    //std::unique_ptr<LoxCallable> clock {static_cast<LoxCallable*>(new TimeFunction())}; 
+    LoxCallable* clock {static_cast<LoxCallable*>(new TimeFunction())}; 
+    globals->define("clock", LoxObject(clock, this)); // possible leak here
+    // need to investigate whyy smart pointers failing. thought is wasn't released as long as interpreter running. 
 }
 
 void Interpreter::resolve(Expr* expr, unsigned int depth) {

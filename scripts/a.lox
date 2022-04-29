@@ -55,10 +55,10 @@ class C < B {}
 
 C().test();
 
-class Eclair {
+/* class Eclair {
   cook() {
     super.cook();
     print "Pipe full of crème pâtissière.";
   }
-}
+} */
 
