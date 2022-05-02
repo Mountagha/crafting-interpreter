@@ -13,7 +13,7 @@ std::vector<Token> Scanner::scanTokens() {
         start = current;
         scanToken();
     }
-    tokens.push_back(Token(EOFILE, "", "", line));
+    tokens.push_back(Token(EOFILE, "", line));
     return tokens;
 }
 }

@@ -120,13 +120,13 @@ class Scanner {
             return source[current++];
         }
 
-        void addToken(TokenType token_type){
-            addToken(token_type, "nil");
+        void addToken(TokenType token_type, std::string lexeme, unsigned int line){
+            tokens.push_back({token_type, lexeme, line});
         }
 
-        void addToken(TokenType token_type, std::any literal) {
+        void addToken(TokenType token_type) {
             std::string text = source.substr(start, current-start);
-            tokens.push_back(Token(token_type, text, literal, line));
+            addToken(token_type, text, line);
         }
         
         // @TODO: Handle it with std::optional & std::variant later maybe
@@ -162,7 +162,7 @@ class Scanner {
 
             // trim the surrounding quotes
             std::string value = source.substr(start+1, current-start-2);
-            addToken(STRING, value);
+            addToken(STRING, value, line);
         }
 
         void number() {
@@ -175,7 +175,7 @@ class Scanner {
                 while(isDigit(peek())) advance();
             }
 
-            addToken(NUMBER, std::stod(source.substr(start, current-start))); // later stock as double
+            addToken(NUMBER); // later stock as double
 
         }
 

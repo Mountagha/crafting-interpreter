@@ -1,0 +1,64 @@
+var a = "global a";
+var b = "global b";
+print a;
+{
+    var a = "local a";
+    {
+        var a = "inner local a";
+        print b;
+    }
+    print a;
+}
+
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print "The " + this.flavor + " cake is " + adjective + "!";
+    }
+}
+var cake = Cake();
+cake.flavor = "German chocolate";
+cake.taste(); // should print "the German chocolate cake is delicious!"
+
+class Doughnut {
+    cook() {
+        print "Fry until golden brown";
+    }
+}
+
+class BostonCream < Doughnut {}
+
+BostonCream().cook();
+
+
+// inheritance, super....
+
+class A {
+  method() {
+    print "A method";
+  }
+}
+
+class B < A {
+  method() {
+    print "B method";
+  }
+
+  test() {
+    super.method();
+  }
+}
+
+class C < B {}
+
+//super.notEvenInAClass();
+
+C().test();
+
+/* class Eclair {
+  cook() {
+    super.cook();
+    print "Pipe full of crème pâtissière.";
+  }
+} */
+

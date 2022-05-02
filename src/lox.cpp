@@ -6,11 +6,14 @@
 #include "lox.hpp"
 #include "parser.hpp"
 #include "ASTprinter.hpp"
+#include "interpreter.hpp"
+#include "resolver.hpp"
 
 namespace lox
 {
 
     bool Lox::hadError{false};
+    bool Lox::hadRuntimeError{false};
 
     void Lox::report(int line, std::string where, std::string message)
     {
@@ -32,23 +35,37 @@ namespace lox
             report (token.line, " at '" + token.lexeme + "'", message);
     }
 
+    void Lox::runtimeError(){
+        hadRuntimeError = true;
+    }    
+
     void Lox::run(const std::string &source)
     {
         Scanner scanner(source);
         std::vector<Token> tokens = scanner.scanTokens();
 
-        for (Token token : tokens)
-        {
-            std::cout << token << std::endl;
-        }
+        //for (Token token : tokens)
+        //{
+        //    std::cout << token << std::endl;
+        //}
         Parser parser{tokens};
-        std::unique_ptr<Expr> expression = parser.parse();
+        std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (hadError) return;
 
-        std::cout << ASTprinter{}.print(expression) << '\n';
+        //ASTprinter{}.print(expression);
 
+        //static interpreter to persist data accross different executions.
+        static Interpreter interpreter{};
+        Resolver resolver(&interpreter);
+
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
+        if (hadError) return;
+        interpreter.interpret(statements);
+         
     }
     void Lox::runFile(std::string path)
     {
@@ -62,6 +79,12 @@ namespace lox
         sstr << in.rdbuf();
         std::string content = sstr.str();
         run(content);
+
+        // exit if there's an syntax error
+        if (hadError) exit(65);
+
+        // exit if there's a runtime error
+        if (hadRuntimeError) exit(70);
     }
 
     void Lox::runPrompt()

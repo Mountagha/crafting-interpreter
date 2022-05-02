@@ -1,33 +1,73 @@
 #pragma once
 
+#include "loxCallable.hpp"
+#include "environment.hpp"
+#include "loxObject.hpp"
 #include "Expr.hpp"
+#include "lox.hpp"
+#include "Stmt.hpp"
+#include <iostream>
+#include <vector>
+#include <map>
 
 namespace lox {
 
-class Interpreter : public Visitor {
+class Interpreter : public ExprVisitor, public  StmtVisitor{
 
-    public: 
-        std::any visitLiteralExpr(Literal& expr) override;
-        std::any visitGroupingExpr(Grouping& expr) override;
-        std::any visitUnaryExpr(Unary& expr) override;
-        std::any visitBinaryExpr(Binary& expr) override;
+    public:
+        Interpreter();
+        // Expr
+        LoxObject visitLiteralExpr(Literal& expr) override;
+        LoxObject visitGroupingExpr(Grouping& expr) override;
+        LoxObject visitUnaryExpr(Unary& expr) override;
+        LoxObject visitBinaryExpr(Binary& expr) override;
+        LoxObject visitVariableExpr(Variable& expr) override;
+        LoxObject visitAssignExpr(Assign& expr) override;
+        LoxObject visitLogicalExpr(Logical& expr) override;
+        LoxObject visitCallExpr(Call& expr) override;
+        LoxObject visitGetExpr(Get& expr) override;
+        LoxObject visitSetExpr(Set& expr) override;
+        LoxObject visitSuperExpr(Super& expr) override;
+        LoxObject visitThisExpr(This& expr) override;
+
+        // Stmt
+        void visitExpressionStmt(Expression& stmt) override;
+        void visitFunctionStmt(Function& stmt) override;
+        void visitIfStmt(If& Stmt) override;
+        void visitPrintStmt(Print& stmt) override;
+        void visitReturnStmt(Return& stmt) override;
+        void visitVarStmt(Var& stmt) override;
+        void visitBlockStmt(Block& stmt) override;
+        void visitWhileStmt(While& stmt) override;
+        void visitClassStmt(Class& stmt) override;
+
+        void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
+        void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
+        void resolve(Expr* expr, unsigned int depth);
     
     private:
-        std::any evaluate(std::unique_ptr<Expr>& expr) {
+
+        PEnvironment globals;
+        PEnvironment environment;
+        std::map<Expr*, unsigned int> locals {};
+
+        LoxObject evaluate(std::unique_ptr<Expr>& expr) {
             return expr->accept(*this);
         }
 
-        bool isTruthy(std::any& object) {
-            if (!(object.has_value())) return false;
-            if (object.type() == typeid(bool)) return std::any_cast<bool>(object);
-            return true;
+        void execute(std::unique_ptr<Stmt>& stmt) {
+            stmt->accept(*this);
         }
 
-        bool isEqual(std::any& object_a, std::any& object_b) {
-            if (!object_a.has_value() && !object_b.has_value()) return true;
-            if (!object_a.has_value()) return false;
-            return true; 
+        LoxObject lookUpVariable(Token name, Expr* expr) {
+            if (locals.find(expr) != locals.end()) {
+                auto distance = locals.at(expr);
+                return environment->getAt(distance, name.lexeme);
+            } else {
+                return globals->get(name);
+            }
         }
+
 
 
 };

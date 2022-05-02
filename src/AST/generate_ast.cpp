@@ -14,6 +14,13 @@ std::string type_from_ptr(const std::string& s){
     return s.substr(0, s.size()-1); // return string without *
 }
 
+bool is_vector_type(const std::string& s) {
+    auto sub = s.find(std::string("std::vector<"));
+    if (sub != std::string::npos)
+        return true;
+    return false;
+}
+
 void declare_classes(std::ostream& out, std::map<std::string, std::string> map) {
     for (const auto& e: map){
         out << "class " + e.first + ";\n";
@@ -33,24 +40,32 @@ std::vector<std::string> split(std::string s, std::string sep) {
     return splits;
 }
 
-void defineVisitor(std::ostream& out, std::string basename, const std::map<std::string, std::string>& map) {
-    // out << "template <typename T>\n";
-    out << "class Visitor {\n";
+void defineVisitor(std::ostream& out, 
+                std::string basename, 
+                const std::map<std::string, 
+                std::string>& map,
+                std::string return_type) {
+
+    out << "class " << basename << "Visitor {\n";
     out << "\tpublic:\n";
     std::string basename_lower = basename;
     std::for_each(basename_lower.begin(), basename_lower.end(), [](char &c ) { c = ::tolower(c); });
     //auto lower_basename = [&basename]() { std::for_each(basename.begin(), basename.end(), ::tolower); };
     for (const auto& e: map){
         std::string type_name = e.first;
-        out << "\t\tvirtual std::any visit" + type_name + basename + "( ";  
+        out << "\t\tvirtual " << return_type << " visit" + type_name + basename + "( ";  
         out <<  type_name + "& " + basename_lower + ") = 0;\n";  
     }
     out << "};\n\n";
 
 }
 
-void define_type(std::ofstream& out, std::string basename, std::string classname, std::vector<std::string> fieldList) {
-    //out << "template<typename T>\n";
+void define_type(std::ofstream& out, 
+                std::string basename, 
+                std::string classname, 
+                std::vector<std::string> fieldList,
+                std::string return_type) {
+
     out << "class " + classname + ": public " + basename + " {\n";
     out << "\tpublic:\n";
     // Constructor
@@ -61,6 +76,8 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
         std::vector<std::string> name_type = split(field, " ");
         if (isPointer(name_type[0]))
             line += "std::unique_ptr<" + type_from_ptr(name_type[0]) + ">&& " + name_type[1] + "_, ";
+        else if (is_vector_type(name_type[0]))
+            line += name_type[0] + "&& " + name_type[1] + "_, ";
         else 
             line += field + "_, "; 
     }
@@ -72,7 +89,7 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     
     for (const auto& field: fieldList) {
         std::vector<std::string> name_type = split(field, " ");
-        if (isPointer(name_type[0]))
+        if (isPointer(name_type[0]) || is_vector_type(name_type[0]))
             out << "\t\t\t" + name_type[1] + " = std::move (" + name_type[1] + "_);\n";
         else
             out << "\t\t\t" + name_type[1] + " = " + name_type[1] + "_;\n";
@@ -82,8 +99,8 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
     
     out << "\t\t}\n";
     // Visitor pattern
-    out << "\t\tstd::any accept(Visitor& visitor) override {\n";
-    out << "\t\t\treturn visitor.visit" + classname + basename + "(*this);\n";
+    out << "\t\t" << return_type << " accept(" << basename << "Visitor& visitor) override {\n";
+    out << "\t\t\t" << (return_type == "void" ? "" : "return ") << "visitor.visit" + classname + basename + "(*this);\n";
     out << "\t\t}\n";
     // fields
     //out << "\tprivate:\n";
@@ -101,7 +118,9 @@ void define_type(std::ofstream& out, std::string basename, std::string classname
 void defineAST(
         std::string output_dir, 
         std::string basename,
-        std::map<std::string,std::string> map
+        std::map<std::string,std::string> map,
+        std::vector<std::string>& includes,
+        std::string return_type
     ) { 
 
     std::string path = output_dir + "/" + basename + ".hpp";
@@ -110,26 +129,26 @@ void defineAST(
         std::cerr << "Unable to open the file for writing";
         std::exit(65);
     }
-    out << "#include \"token.hpp\"\n";
-    out << "#include <memory>\n\n";
-    out << "namespace lox { \n\n";
+    out << "#pragma once\n\n";
+    for (const auto& include_ : includes) 
+        out << "#include " << include_ << '\n'; 
+    out << "\nnamespace lox { \n\n";
     // declare classes
     declare_classes(out, map);
     // Define visitor class 
-    defineVisitor(out, basename, map);
+    defineVisitor(out, basename, map, return_type);
     // define base class
-    // out << "template<typename T>\n";
     out << "class " + basename + " {\n\n";
     out << "\tpublic:\n";
     out << "\t\t" + basename + "() = default;\n";
     out << "\t\t~" + basename + "() = default;\n";
-    out << "\t\tvirtual std::any accept(Visitor& visitor) = 0;\n";
+    out << "\t\tvirtual " << return_type << " accept(" << basename << "Visitor& visitor) = 0;\n";
     out << "};\n\n";
 
     for (auto& e: map) {
         std::string classname = e.first;
         std::vector<std::string> fields = split(e.second, ", ");
-        define_type(out, basename, classname, fields);
+        define_type(out, basename, classname, fields, return_type);
     }
     
     //out << "} // AST namespace\n";
@@ -144,13 +163,38 @@ int main(int argc, char *argv[]) {
         std::exit(64);
     }
     std::string output_dir = argv[1];
-    std::map<std::string, std::string> map {
+    std::map<std::string, std::string> expr_map {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
+        {"Call", "Expr* callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments"},
+        {"Get", "Expr* object, Token name"},
+        {"Assign", "Token name, Expr* value"},
         {"Grouping", "Expr* expression"},
-        {"Literal", "std::any value"},
-        {"Unary", "Token operator_, Expr* right"} 
+        {"Literal", "LoxObject value"},
+        {"Logical", "Expr* left, Token operator_, Expr* right"},
+        {"Set", "Expr* object, Token name, Expr* value"},
+        {"Super", "Token keyword, Token method"},
+        {"This", "Token keyword"},
+        {"Unary", "Token operator_, Expr* right"},
+        {"Variable", "Token name"}
     };
 
-    defineAST(output_dir, "Expr", map);
+    std::vector<std::string> includes {"\"token.hpp\"", "\"loxObject.hpp\"", "<memory>", "<vector>"};
+    defineAST(output_dir, "Expr", expr_map, includes, "LoxObject");
+
+    std::map<std::string, std::string> stmt_map {
+        {"Block", "std::vector<std::unique_ptr<Stmt>> statements"},
+        {"Class", "Token name, Expr* superclass, std::vector<std::unique_ptr<Function>> methods"},
+        {"Expression", "Expr* expression"},
+        {"Function", "Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body"},
+        {"If", "Expr* condition, Stmt* thenBranch, Stmt* elseBranch"},
+        {"Print", "Expr* expression"},
+        {"Return", "Token keyword, Expr* value"},
+        {"Var", "Token name, Expr* initializer"},
+        {"While", "Expr* condition, Stmt* body"}
+    };
+
+    includes.push_back("\"Expr.hpp\"");
+
+    defineAST (output_dir, "Stmt", stmt_map, includes, "void");
     return 0;
 }

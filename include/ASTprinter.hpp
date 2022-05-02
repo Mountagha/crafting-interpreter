@@ -8,51 +8,43 @@
 
 namespace lox {
 
-class ASTprinter: public Visitor {
+class ASTprinter: public ExprVisitor {
     public:
-        std::string print(std::unique_ptr<Expr>& expr) {
-            return std::any_cast<std::string>(expr->accept(*this));
+        void print(std::unique_ptr<Expr>& expr) {
+            expr->accept(*this);
+            std::cout << ast_string << '\n';
         }
 
-        std::any visitBinaryExpr(Binary& expr) override {
-            return parenthesize(expr.operator_.lexeme, {expr.left.get(), expr.right.get()});
+        LoxObject visitBinaryExpr(Binary& expr) override {
+            parenthesize(expr.operator_.lexeme, {expr.left.get(), expr.right.get()});
+            return LoxObject();
         }
 
-        std::any visitGroupingExpr(Grouping& expr) override {
-            return parenthesize("group", {expr.expression.get()});
+        LoxObject visitGroupingExpr(Grouping& expr) override {
+            parenthesize("group", {expr.expression.get()});
+            return LoxObject();
         }
 
-        std::any visitLiteralExpr(Literal& expr) override {
-            if ( expr.value.has_value() ) {
-                auto& literal_type = expr.value.type();
-                if (literal_type == typeid(double))
-                    return std::to_string(std::any_cast<double>(expr.value));
-                else if (literal_type == typeid(int))
-                    return std::to_string(std::any_cast<int>(expr.value));
-                else if (literal_type == typeid(std::string))
-                    return std::any_cast<std::string>(expr.value);
-                else if (literal_type == typeid(bool))
-                    return std::any_cast<bool>(expr.value) ? std::string("true") : std::string("false");
-                else 
-                    return std::string("unrecognized literal type");
-            } else // not value 
-                return std::string("nil");
+        LoxObject visitLiteralExpr(Literal& expr) override {
+            ast_string += (std::string)expr.value;
+            return LoxObject(); 
         }
 
-        std::any visitUnaryExpr(Unary& expr) override {
-            return parenthesize(expr.operator_.lexeme, {expr.right.get()});
+        LoxObject visitUnaryExpr(Unary& expr) override {
+            parenthesize(expr.operator_.lexeme, {expr.right.get()});
+            return LoxObject();
         }
     private: 
-        std::string parenthesize(std::string name, const std::vector<Expr*>& exprs){
-            std::stringstream ss;
-            ss << "(" + name;
+        void parenthesize(std::string name, const std::vector<Expr*>& exprs){
+            ast_string += "(" + name;
             for (const auto& expr: exprs) {
-                ss << " ";
-                ss << std::any_cast<std::string>(expr->accept(*this));
+                ast_string +=  " ";
+                expr->accept(*this);
             }
-            ss << ")";
-            return std::any_cast<std::string>(ss.str());
+            ast_string += ")";
         }
+
+        std::string ast_string;
 };
 
 } // namespace lox
@@ -72,7 +64,7 @@ int main(int argc, char *argv[]){
                                             std::make_unique<Literal>(45.76)
                                         )
     ); 
-    std::cout << ASTprinter{}.print(expression) << '\n';
+    ASTprinter{}.print(expression);
 }
 
 */

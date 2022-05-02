@@ -1,6 +1,8 @@
 #pragma once 
 
 #include <string>
+#include <ostream>
+#include <vector>
 #include "token.hpp"
 
 namespace lox {
@@ -10,11 +12,19 @@ enum class LoxType {
     Bool,
     Number,
     String,
+    Callable,
+    Class,
+    Instance
 };
 
 inline bool operator<(LoxType a, LoxType b) {
     return static_cast<int>(a) < static_cast<int>(b);
 }
+
+class Interpreter;
+class LoxCallable;
+class LoxClass;
+class LoxInstance;
 
 class LoxObject {
     public:
@@ -22,16 +32,25 @@ class LoxObject {
         explicit LoxObject(bool b): lox_type(LoxType::Bool), boolean{b} {}
         explicit LoxObject(double d): lox_type(LoxType::Number), number{d} {}
         explicit LoxObject(std::string s): lox_type(LoxType::String), string{s} {}
-        // add Callable later
+        explicit LoxObject( LoxCallable* callable, Interpreter* in);
+        explicit LoxObject( LoxClass* lk, Interpreter* in);
+        explicit LoxObject( LoxInstance* li, Interpreter* in);
 
         explicit LoxObject(Token token);
         LoxObject(const LoxObject&);
         LoxObject& operator=(const LoxObject& );
         ~LoxObject();
 
+        // Get, Set
+        LoxObject get(Token name);
+        LoxObject set(Token name, LoxObject value);
+
+        LoxObject operator()(Interpreter& in, std::vector<LoxObject> args);
+
 
         friend bool operator==(const LoxObject& a, const LoxObject& b);
         friend bool operator<(const LoxObject& a, const LoxObject& b);
+        friend std::ostream& operator<<(std::ostream& os, const LoxObject& o);
         friend LoxObject operator-(LoxObject a);
         friend LoxObject operator!(LoxObject a);
 
@@ -40,12 +59,26 @@ class LoxObject {
         LoxObject& operator*=(const LoxObject& o);
         LoxObject& operator/=(const LoxObject& o);
 
-        LoxObject get(Token name);
-        LoxObject set(Token name, LoxObject value);
-        
         operator std::string() const;
         operator double() const;
         operator bool() const;
+
+        // needed getters and setters
+        LoxCallable* getFunction() const {
+            return function;
+        }
+
+        LoxInstance* getInstance() const {
+            return instance;
+        }
+
+        LoxType getLoxObjectType() const {
+            return lox_type;
+        }
+
+        LoxClass* getLoxClass() const {
+            return loxklass;
+        }
 
 
     private:
@@ -53,15 +86,27 @@ class LoxObject {
         double number = 0.;
         bool boolean = false;
         std::string string = "";
+        LoxCallable* function = nullptr;
+        Interpreter* interpreter = nullptr;
+        LoxClass* loxklass = nullptr;
+        LoxInstance* instance = nullptr;
+
 
         void cast(LoxType t) {
             if (t == lox_type) return;
-            // handle other types later
+            if (lox_type == LoxType::Callable) {
+                throw std::runtime_error("Cannot convert callable to non-callable");
+            }
+            if (t == LoxType::Class || t == LoxType::Instance) {
+                throw std::runtime_error("Cannot convert class to non-class");
+            }
             switch(t) {
                 case LoxType::Nil: break;
                 case LoxType::Bool: boolean = (bool)(*this); break;
                 case LoxType::Number: number = (double)(*this); break;
                 case LoxType::String: string = (std::string)(*this); break;
+                case LoxType::Callable:
+                    throw std::runtime_error("Cannot convert non-callable to callable");
                 // handle other types later
             }
 
