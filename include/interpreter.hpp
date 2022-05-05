@@ -16,6 +16,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
 
     public:
         Interpreter();
+        ~Interpreter();
         // Expr
         LoxObject visitLiteralExpr(Literal& expr) override;
         LoxObject visitGroupingExpr(Grouping& expr) override;
@@ -41,6 +42,14 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void visitWhileStmt(While& stmt) override;
         void visitClassStmt(Class& stmt) override;
 
+        // handful functions for better memory managements with callables
+        void addUser(LoxClass* klass);
+        void addUser(LoxCallable* func);
+        void addUser(LoxInstance* inst);
+        void removeUser(LoxClass* klass);
+        void removeUser(LoxCallable* func);
+        void removeUser(LoxInstance* inst);
+
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
         void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
         void resolve(Expr* expr, unsigned int depth);
@@ -50,6 +59,13 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         PEnvironment globals;
         PEnvironment environment;
         std::map<Expr*, unsigned int> locals {};
+
+        std::map<LoxCallable*, std::pair<std::unique_ptr<LoxClass>, size_t>> m_callables;
+        std::map<LoxClass*, std::pair<std::unique_ptr<LoxClass>, size_t>> m_classes;
+        std::map<LoxInstance*, std::pair<std::unique_ptr<LoxInstance>, size_t>> m_instances;
+
+        bool m_destroying;
+         
 
         LoxObject evaluate(std::unique_ptr<Expr>& expr) {
             return expr->accept(*this);

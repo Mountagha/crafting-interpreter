@@ -12,6 +12,42 @@ Interpreter::Interpreter() {
     // need to investigate whyy smart pointers failing. thought is wasn't released as long as interpreter running. 
 }
 
+void Interpreter::addUser(LoxCallable* func) {
+    ++m_callables[func].second;
+}
+
+void Interpreter::addUser(LoxClass* klass) {
+    ++m_classes[klass].second;
+}
+
+void Interpreter::addUser(LoxInstance* inst) {
+    ++m_instances[inst].second;
+}
+
+void Interpreter::removeUser(LoxCallable* func) {
+    if (m_destroying) return;
+    --m_callables[func].second;
+    if(!m_callables[func].second){
+        m_callables.clear();
+    }
+}
+
+void Interpreter::removeUser(LoxClass* klass) {
+    if (m_destroying) return;
+    --m_classes[klass].second;
+    if (!m_classes[klass].second) {
+        m_classes.clear();
+    }
+}
+
+void Interpreter::removeUser(LoxInstance* inst) {
+    if (m_destroying) return;
+    --m_instances[inst].second;
+    if (!m_instances[inst].second) {
+        m_instances.clear();
+    }
+}
+
 void Interpreter::resolve(Expr* expr, unsigned int depth) {
     locals.insert({expr, depth});
 }
