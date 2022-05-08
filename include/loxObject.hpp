@@ -40,6 +40,7 @@ class LoxObject {
         LoxObject(const LoxObject&);
         LoxObject& operator=(const LoxObject& );
         ~LoxObject();
+        void saveCallableCopy();
 
         // Get, Set
         LoxObject get(Token name);

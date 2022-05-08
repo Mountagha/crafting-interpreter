@@ -12,6 +12,17 @@ Interpreter::Interpreter() {
     // need to investigate whyy smart pointers failing. thought is wasn't released as long as interpreter running. 
 }
 
+Interpreter::~Interpreter() {
+    // Manually delete objects since functions assume their 
+    // interpreter is valid when they are destroyed.
+    
+    // Note: this is a hack to avoid double-destruction
+    m_destroying = true;
+    m_instances.clear();
+    m_classes.clear();
+    m_callables.clear();
+}
+
 void Interpreter::addUser(LoxCallable* func) {
     ++m_callables[func].second;
 }

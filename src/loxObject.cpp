@@ -24,6 +24,7 @@ LoxObject::LoxObject(const LoxObject& o){
     instance = o.instance;
     loxklass = o.loxklass;
     interpreter = o.interpreter;
+    if (interpreter) saveCallableCopy();
 }
 
 LoxObject& LoxObject::operator=(const LoxObject& o){
@@ -35,10 +36,43 @@ LoxObject& LoxObject::operator=(const LoxObject& o){
     instance = o.instance;
     loxklass = o.loxklass;
     interpreter = o.interpreter;
+    if (interpreter) saveCallableCopy();
     return *this;
 }
 
-LoxObject::~LoxObject() {} // nothing for now.
+void LoxObject::saveCallableCopy() {
+    switch (lox_type) {
+        case LoxType::Callable:
+            interpreter->addUser(function);
+            break;
+        case LoxType::Class:
+            interpreter->addUser(loxklass);
+            break;
+        case LoxType::Instance:
+            interpreter->addUser(instance);
+            break;
+        default:
+            throw std::logic_error("Expected object to be callable or class.");
+    }
+}
+
+LoxObject::~LoxObject() {
+    if (interpreter) {
+        switch (lox_type) {
+            case LoxType::Callable:
+                interpreter->removeUser(function);
+                break;
+            case LoxType::Class:
+                interpreter->removeUser(loxklass);
+                break;
+            case LoxType::Instance:
+                interpreter->removeUser(instance);
+                break;
+            default:
+                throw std::logic_error("Lox Object has bad type when destroyed.");
+        }
+    }
+} 
 
 LoxObject LoxObject::get(Token name) {
     if (lox_type != LoxType::Instance) {
