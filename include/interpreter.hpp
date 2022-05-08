@@ -50,6 +50,9 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void removeUser(LoxCallable* func);
         void removeUser(LoxInstance* inst);
 
+        LoxCallable* createFunction(Function& stmt, PEnvironment env);
+        LoxInstance* createInstance(LoxClass* loxklass);
+
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
         void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
         void resolve(Expr* expr, unsigned int depth);

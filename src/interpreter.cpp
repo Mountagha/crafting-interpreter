@@ -59,6 +59,10 @@ void Interpreter::removeUser(LoxInstance* inst) {
     }
 }
 
+LoxCallable* Interpreter::createFunction(Function& stmt, PEnvironment env) {
+    std::unique_ptr<LoxCallable> func { (static_cast<LoxCallable*>(new LoxFunction(&stmt, env))) };
+}
+
 void Interpreter::resolve(Expr* expr, unsigned int depth) {
     locals.insert({expr, depth});
 }
