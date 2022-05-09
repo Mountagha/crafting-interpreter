@@ -39,7 +39,8 @@ class TimeFunction : public LoxCallable {
 
 class LoxFunction : public LoxCallable {
     public:
-        LoxFunction(Function* declaration, PEnvironment encl, bool isInit = false);
+        LoxFunction(Function* declaration, Interpreter* inpt, PEnvironment encl, bool isInit = false);
+        LoxFunction(LoxFunction& other, PEnvironment encl);
         ~LoxFunction();
         size_t arity() const override { return declaration->params.size(); }
         std::string name() const override { return "<fun " + declaration->name.lexeme + ">"; }
@@ -56,6 +57,7 @@ class LoxFunction : public LoxCallable {
     private:
         bool isInitializer;
         Function* declaration;
+        Interpreter* interpreter;
         PEnvironment enclosing;
 };
 

@@ -50,8 +50,11 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         void removeUser(LoxCallable* func);
         void removeUser(LoxInstance* inst);
 
-        LoxCallable* createFunction(Function& stmt, PEnvironment env);
+        LoxFunction* createFunction(LoxFunction* stmt, PEnvironment env);
+        LoxFunction* createFunction(Function* stmt, PEnvironment env, bool initClass = false);
         LoxInstance* createInstance(LoxClass* loxklass);
+        void registerFunction(LoxFunction* func, PEnvironment);
+        void deleteFunction(LoxFunction* func);
 
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
         void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
@@ -66,6 +69,8 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         std::map<LoxCallable*, std::pair<std::unique_ptr<LoxCallable>, size_t>> m_callables;
         std::map<LoxClass*, std::pair<std::unique_ptr<LoxClass>, size_t>> m_classes;
         std::map<LoxInstance*, std::pair<std::unique_ptr<LoxInstance>, size_t>> m_instances;
+
+        std::map<LoxFunction*, PEnvironment> m_funcenvs;
 
         bool m_destroying;
          

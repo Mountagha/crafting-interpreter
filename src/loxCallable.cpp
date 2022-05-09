@@ -6,10 +6,20 @@
 
 namespace lox {
 
-LoxFunction::LoxFunction(Function* decl, std::shared_ptr<Environment> encl, bool isInit) {
+LoxFunction::LoxFunction(Function* decl, Interpreter* intp, std::shared_ptr<Environment> encl, bool isInit) {
     declaration = decl;
     enclosing = encl;
     isInitializer = isInit;
+    interpreter = intp;
+    interpreter->registerFunction(this, std::make_shared<Environment>(enclosing));
+}
+
+LoxFunction::LoxFunction(LoxFunction& other, std::shared_ptr<Environment> encl) {
+    declaration = other.declaration;
+    enclosing = encl;
+    isInitializer = other.isInitializer;
+    interpreter = other.interpreter;
+    interpreter->registerFunction(this, enclosing);
 }
 
 LoxFunction::~LoxFunction() { /* handle later */ }
@@ -37,7 +47,7 @@ LoxClass::LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnviro
 
     for (auto& m: stmt->methods) {
         isInit = m->name.lexeme == "init" ? true : false;
-        LoxCallable* method {static_cast<LoxCallable*>(new LoxFunction(m.get(), encl, isInit))}; // possible leak with get maybe 
+        auto* method = interpreter->createFunction(m.get(), encl, isInit);
         methods[m->name.lexeme] = LoxObject(method, intp);
     }
 }
@@ -46,10 +56,10 @@ LoxObject LoxClass::function(Token name, LoxInstance* instance) {
     // possible leak in this function. Check later.
     auto var = methods.find(name.lexeme);
     if (var != methods.end()) {
-        LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction()); // possible leak ?
+        LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction()); 
         PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
         environment->define("this", LoxObject(instance, interpreter));
-        LoxCallable* new_method {static_cast<LoxCallable*>(new LoxFunction(func->getDeclaration(), environment))}; 
+        auto* new_method = interpreter->createFunction(func, environment); 
         return LoxObject(new_method, interpreter);
     }
     if (super) return super->function(name, instance); 

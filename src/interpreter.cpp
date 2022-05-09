@@ -59,15 +59,36 @@ void Interpreter::removeUser(LoxInstance* inst) {
     }
 }
 
-LoxCallable* Interpreter::createFunction(Function& stmt, PEnvironment env) {
-    std::unique_ptr<LoxCallable> func { static_cast<LoxCallable*>(new LoxFunction(&stmt, env)) };
+LoxFunction* Interpreter::createFunction(LoxFunction* fun, PEnvironment env) {
+    std::unique_ptr<LoxFunction> func = std::make_unique<LoxFunction>(*fun, env);
     auto* callablePtr = func.get();
     m_callables[callablePtr] = {std::move(func), 0};
     return callablePtr;
 }
 
+LoxFunction* Interpreter::createFunction(Function* stmt, PEnvironment env, bool initClass) {
+    std::unique_ptr<LoxFunction> func = std::make_unique<LoxFunction>(stmt, this, env, initClass);
+    auto* callablePtr = func.get();
+    m_callables[callablePtr] = {std::move(func), 0};
+    return callablePtr;
+}
+
+void Interpreter::registerFunction(LoxFunction* func, PEnvironment env) {
+    if (m_funcenvs.find(func) != m_funcenvs.end()) {
+        throw std::runtime_error("Function already registered.");
+    }
+    m_funcenvs[func] = env;
+}
+
+void Interpreter::deleteFunction(LoxFunction* func) {
+    if (m_funcenvs.find(func) == m_funcenvs.end()) {
+        throw std::runtime_error("Failed to find function to delete.\n");
+    }
+    m_funcenvs.erase(func);
+}
+
 LoxInstance* Interpreter::createInstance(LoxClass* loxklass) {
-    std::unique_ptr<LoxInstance> instance { static_cast<LoxInstance*>(new LoxInstance(loxklass))};
+    std::unique_ptr<LoxInstance> instance = std::make_unique<LoxInstance>(loxklass);
     auto* instancePtr = instance.get();
     m_instances[instancePtr] = {std::move(instance), 0};
     return instancePtr;
@@ -194,7 +215,7 @@ void Interpreter::visitExpressionStmt(Expression& stmt) {
 }
 
 void Interpreter::visitFunctionStmt(Function& stmt) {
-    LoxCallable* function = createFunction(stmt, environment);
+    auto* function = createFunction(&stmt, environment);
     environment->define(stmt.name.lexeme, LoxObject(function, this));
 }
 
