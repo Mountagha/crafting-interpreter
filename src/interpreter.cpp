@@ -60,7 +60,17 @@ void Interpreter::removeUser(LoxInstance* inst) {
 }
 
 LoxCallable* Interpreter::createFunction(Function& stmt, PEnvironment env) {
-    std::unique_ptr<LoxCallable> func { (static_cast<LoxCallable*>(new LoxFunction(&stmt, env))) };
+    std::unique_ptr<LoxCallable> func { static_cast<LoxCallable*>(new LoxFunction(&stmt, env)) };
+    auto* callablePtr = func.get();
+    m_callables[callablePtr] = {std::move(func), 0};
+    return callablePtr;
+}
+
+LoxInstance* Interpreter::createInstance(LoxClass* loxklass) {
+    std::unique_ptr<LoxInstance> instance { static_cast<LoxInstance*>(new LoxInstance(loxklass))};
+    auto* instancePtr = instance.get();
+    m_instances[instancePtr] = {std::move(instance), 0};
+    return instancePtr;
 }
 
 void Interpreter::resolve(Expr* expr, unsigned int depth) {
@@ -184,7 +194,7 @@ void Interpreter::visitExpressionStmt(Expression& stmt) {
 }
 
 void Interpreter::visitFunctionStmt(Function& stmt) {
-    LoxCallable* function {static_cast<LoxCallable*>(new LoxFunction(&stmt, environment))}; // possible leak (never freed)
+    LoxCallable* function = createFunction(stmt, environment);
     environment->define(stmt.name.lexeme, LoxObject(function, this));
 }
 
@@ -253,13 +263,16 @@ void Interpreter::visitClassStmt(Class& stmt) {
         environment->define("super", superclass);
         // will allow methods closure to capture environment containing super.  
     }
-    LoxClass* classy = new LoxClass(&stmt, superclass.getLoxClass(), this, environment); // possible leak here. not freed.
+    auto classy = std::make_unique<LoxClass>(&stmt, superclass.getLoxClass(), this, environment);
+    auto* classyPtr = classy.get();
+    m_classes[classyPtr] = {std::move(classy), 0};
+
 
     if (superclass.getLoxObjectType() != LoxType::Nil) {
         environment = environment->enclosing;
     }
 
-    environment->assign(stmt.name, LoxObject(classy, this));
+    environment->assign(stmt.name, LoxObject(classyPtr, this));
 }
 
 void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>>& statements) {

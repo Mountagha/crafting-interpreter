@@ -63,7 +63,7 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
         PEnvironment environment;
         std::map<Expr*, unsigned int> locals {};
 
-        std::map<LoxCallable*, std::pair<std::unique_ptr<LoxClass>, size_t>> m_callables;
+        std::map<LoxCallable*, std::pair<std::unique_ptr<LoxCallable>, size_t>> m_callables;
         std::map<LoxClass*, std::pair<std::unique_ptr<LoxClass>, size_t>> m_classes;
         std::map<LoxInstance*, std::pair<std::unique_ptr<LoxInstance>, size_t>> m_instances;
 
@@ -91,4 +91,4 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
 
 };
 
-}
+} // lox namespace
