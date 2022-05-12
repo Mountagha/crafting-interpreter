@@ -22,7 +22,7 @@ LoxFunction::LoxFunction(LoxFunction& other, std::shared_ptr<Environment> encl) 
     interpreter->registerFunction(this, enclosing);
 }
 
-LoxFunction::~LoxFunction() { /* handle later */ }
+LoxFunction::~LoxFunction() { interpreter->deleteFunction(this); }
 
 LoxObject LoxFunction::operator()(Interpreter& intp, std::vector<LoxObject> args) {
     auto environment = std::make_shared<Environment>(enclosing);
@@ -74,7 +74,7 @@ LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
         std::runtime_error("class constructed in different interpreter.");
     }
 
-    LoxInstance* instance = new LoxInstance(this);  // possible leak here. not freed
+    LoxInstance* instance = interpreter->createInstance(this); 
     auto instance_object = LoxObject(instance, &intp);
     if (methods.find("init") != methods.end()) {
         // we are giving the line of the token 0 cause we don't care. We just want to retrieve the init method using its name. 

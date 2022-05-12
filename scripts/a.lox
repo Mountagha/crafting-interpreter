@@ -1,4 +1,4 @@
-/*var a = "global a";
+var a = "global a";
 var b = "global b";
 print a;
 {
@@ -68,7 +68,7 @@ fun echo(n) {
 }
 
 print echo(echo(1) + echo(2)) + echo(echo(4) + echo(5));
-*/
+
 fun test() {
   print "bonjour";
 }

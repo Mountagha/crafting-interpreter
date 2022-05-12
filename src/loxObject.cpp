@@ -7,13 +7,19 @@
 namespace lox {
 
 LoxObject::LoxObject(LoxCallable* callable, Interpreter* in) 
-    : function{callable}, interpreter{in}, lox_type{LoxType::Callable} {}
+    : function{callable}, interpreter{in}, lox_type{LoxType::Callable} {
+        interpreter->addUser(function);
+}
 
 LoxObject::LoxObject(LoxInstance* li, Interpreter* in) 
-    : instance{li}, interpreter{in}, lox_type{LoxType::Instance} {}
+    : instance{li}, interpreter{in}, lox_type{LoxType::Instance} {
+        interpreter->addUser(li);
+}
 
 LoxObject::LoxObject(LoxClass* lk, Interpreter* in)
-    : loxklass{lk}, interpreter{in}, lox_type{LoxType::Class} {}
+    : loxklass{lk}, interpreter{in}, lox_type{LoxType::Class} {
+        interpreter->addUser(lk);
+}
 
 LoxObject::LoxObject(const LoxObject& o){
     string = o.string;

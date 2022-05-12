@@ -4,12 +4,13 @@
 namespace lox {
 
 Interpreter::Interpreter() {
+    m_destroying = false;
     globals = std::make_shared<Environment>();
     environment = globals;
-    //std::unique_ptr<LoxCallable> clock {static_cast<LoxCallable*>(new TimeFunction())}; 
-    LoxCallable* clock {static_cast<LoxCallable*>(new TimeFunction())}; 
-    globals->define("clock", LoxObject(clock, this)); // possible leak here
-    // need to investigate whyy smart pointers failing. thought is wasn't released as long as interpreter running. 
+    std::unique_ptr<LoxCallable> clock {static_cast<LoxCallable*>(new TimeFunction())}; 
+    auto* clockPtr = clock.get();
+    m_callables[clockPtr] = {std::move(clock), 0};
+    globals->define("clock", LoxObject(clockPtr, this));
 }
 
 Interpreter::~Interpreter() {
@@ -21,6 +22,7 @@ Interpreter::~Interpreter() {
     m_instances.clear();
     m_classes.clear();
     m_callables.clear();
+    m_funcenvs.clear();
 }
 
 void Interpreter::addUser(LoxCallable* func) {
@@ -39,7 +41,7 @@ void Interpreter::removeUser(LoxCallable* func) {
     if (m_destroying) return;
     --m_callables[func].second;
     if(!m_callables[func].second){
-        m_callables.clear();
+        m_callables.erase(func);
     }
 }
 
@@ -47,7 +49,7 @@ void Interpreter::removeUser(LoxClass* klass) {
     if (m_destroying) return;
     --m_classes[klass].second;
     if (!m_classes[klass].second) {
-        m_classes.clear();
+        m_classes.erase(klass);
     }
 }
 
@@ -55,19 +57,19 @@ void Interpreter::removeUser(LoxInstance* inst) {
     if (m_destroying) return;
     --m_instances[inst].second;
     if (!m_instances[inst].second) {
-        m_instances.clear();
+        m_instances.erase(inst);
     }
 }
 
 LoxFunction* Interpreter::createFunction(LoxFunction* fun, PEnvironment env) {
-    std::unique_ptr<LoxFunction> func = std::make_unique<LoxFunction>(*fun, env);
+    auto func = std::make_unique<LoxFunction>(*fun, env);
     auto* callablePtr = func.get();
     m_callables[callablePtr] = {std::move(func), 0};
     return callablePtr;
 }
 
 LoxFunction* Interpreter::createFunction(Function* stmt, PEnvironment env, bool initClass) {
-    std::unique_ptr<LoxFunction> func = std::make_unique<LoxFunction>(stmt, this, env, initClass);
+    auto func = std::make_unique<LoxFunction>(stmt, this, env, initClass);
     auto* callablePtr = func.get();
     m_callables[callablePtr] = {std::move(func), 0};
     return callablePtr;
@@ -173,7 +175,7 @@ LoxObject Interpreter::visitBinaryExpr(Binary& expr) {
         case TokenType::BANG_EQUAL: return LoxObject(left != right);
         case TokenType::EQUAL_EQUAL: return LoxObject(left == right);
         default:
-            std::runtime_error("unknown binary expression");
+            throw std::runtime_error("unknown binary expression");
     }
 
 }
