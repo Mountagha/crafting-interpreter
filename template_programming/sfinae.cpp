@@ -13,6 +13,11 @@ typename T::size_type len(T const& t) {
     return t.size();
 }
 
+template<typename T>
+auto len(T const& t) -> decltype( (void)(t.size()), T::size_type() ) {
+    return t.size();
+}
+
 int main() {
     int a[10];
     std::cout << len(a);        // only len() for array matches

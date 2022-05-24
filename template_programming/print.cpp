@@ -38,6 +38,14 @@ void printByIdx(T t, Indices<Idx...>) {
     print(std::get<Idx>(t)...);
 }
 
+template<typename T, typename... Types>
+void printcxx17 (T const& firstArg, Types const&... args) {
+    std::cout << firstArg << '\n';
+    if constexpr(sizeof...(args) > 0) {
+        printcxx17(args...); // code only available if sizeof...(args) > 0 (since c++17)
+    }
+}
+
 int main() {
     std::string s("abc");
     print(8, 2.9, s, "other const char");
@@ -48,4 +56,6 @@ int main() {
 
     auto t = std::make_tuple(12, "monkeys", 2.0);
     printByIdx(t, Indices<0, 1, 2>());
+
+    printcxx17(1, 2, "c++17", 3.0);
 }
