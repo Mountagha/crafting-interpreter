@@ -1,0 +1,9 @@
+/* testing C-like comments */ 
+// this old one should also work
+/* multilines
+   are also 
+   supposed to work.
+*/
+
+/**/
+// also test

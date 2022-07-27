@@ -20,4 +20,6 @@ jobs:
         cmake ..
         make
         cd ..
+        chmod +x run_tests.sh
+        ./run_tests.sh ./build/interpreter
         rm -r build
