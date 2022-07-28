@@ -210,7 +210,8 @@ class Parser {
         }
 
         PExpr assignment(){
-            PExpr expr = Or();
+            // PExpr expr = Or();
+            PExpr expr = ternary();
 
             if (match ({EQUAL})) {
                 Token equals = previous();
@@ -225,6 +226,18 @@ class Parser {
                     return std::make_unique<Set>(std::move(getExpr->object), getExpr->name, std::move(value));
                 } 
                 Lox::error(equals, "Invalid assigment target.");
+            }
+            return expr;
+        }
+
+        PExpr ternary() {
+            PExpr expr = Or();
+            
+            if (match ({QUESTION_MARK})) {
+                PExpr thenBranch = expression();
+                consume(COLON, "Expect ':' after expression in ternary.");
+                PExpr elseBranch = expression();
+                return std::make_unique<Ternary>(std::move(expr), std::move(thenBranch), std::move(elseBranch));
             }
             return expr;
         }

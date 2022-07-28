@@ -5,6 +5,11 @@
 #include <utility>
 #include <algorithm>
 
+void banner(std::ostream& out) {
+    out << "/*  \n\t Be aware that this is a auto-generated source file hence \
+                \n\t no modification should be done directly. \
+                \n\t All changes MUST BE added via the src/AST/generate_ast.cpp file.\n*/\n";
+}
 
 bool isPointer(const std::string& s) {
     return s.size() && s.back() == '*';
@@ -129,6 +134,9 @@ void defineAST(
         std::cerr << "Unable to open the file for writing";
         std::exit(65);
     }
+
+    banner(out);
+
     out << "#pragma once\n\n";
     for (const auto& include_ : includes) 
         out << "#include " << include_ << '\n'; 
@@ -174,6 +182,7 @@ int main(int argc, char *argv[]) {
         {"Set", "Expr* object, Token name, Expr* value"},
         {"Super", "Token keyword, Token method"},
         {"This", "Token keyword"},
+        {"Ternary", "Expr* condition, Expr* thenBranch, Expr* elseBranch"},
         {"Unary", "Token operator_, Expr* right"},
         {"Variable", "Token name"}
     };

@@ -1,0 +1,4 @@
+var a = 5;
+var b = 3;
+
+var max = a > b ? a : b;

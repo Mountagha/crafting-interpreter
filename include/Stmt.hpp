@@ -1,3 +1,8 @@
+/*  
+	 Be aware that this is a auto-generated source file hence                 
+	 no modification should be done directly.                 
+	 All changes MUST BE added via the src/AST/generate_ast.cpp file.
+*/
 #pragma once
 
 #include "token.hpp"
