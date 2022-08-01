@@ -1,0 +1,8 @@
+var a = 5;
+var b = 3;
+var c = 10;
+var max = a > b ? (a > c ? a : c ) : (b > c ? b : c);
+var max2 = a > b ? a > c ? a : c  : b > c ? b : c;
+
+print max; // should be 10
+print max2; // should also be 10

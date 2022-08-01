@@ -192,6 +192,13 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             return LoxObject();
         }
 
+        LoxObject visitTernaryExpr(Ternary& expr) {
+            resolve(expr.condition);
+            resolve(expr.thenBranch);
+            resolve(expr.elseBranch);
+            return LoxObject();
+        }
+
         LoxObject visitUnaryExpr(Unary& expr) override {
             resolve(expr.right);
             return LoxObject();

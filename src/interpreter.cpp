@@ -133,6 +133,11 @@ LoxObject Interpreter::visitThisExpr(This& expr) {
     return lookUpVariable(expr.keyword, &expr);
 }
 
+LoxObject Interpreter::visitTernaryExpr(Ternary& expr) {
+    return evaluate(expr.condition) ? evaluate(expr.thenBranch)
+                                    : evaluate(expr.elseBranch);
+}
+
 LoxObject Interpreter::visitGroupingExpr(Grouping& expr) {
     return evaluate(expr.expression);
 }

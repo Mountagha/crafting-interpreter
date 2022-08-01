@@ -1,3 +1,8 @@
+/*  
+	 Be aware that this is a auto-generated source file hence                 
+	 no modification should be done directly.                 
+	 All changes MUST BE added via the src/AST/generate_ast.cpp file.
+*/
 #pragma once
 
 #include "token.hpp"
@@ -16,6 +21,7 @@ class Literal;
 class Logical;
 class Set;
 class Super;
+class Ternary;
 class This;
 class Unary;
 class Variable;
@@ -31,6 +37,7 @@ class ExprVisitor {
 		virtual LoxObject visitLogicalExpr( Logical& expr) = 0;
 		virtual LoxObject visitSetExpr( Set& expr) = 0;
 		virtual LoxObject visitSuperExpr( Super& expr) = 0;
+		virtual LoxObject visitTernaryExpr( Ternary& expr) = 0;
 		virtual LoxObject visitThisExpr( This& expr) = 0;
 		virtual LoxObject visitUnaryExpr( Unary& expr) = 0;
 		virtual LoxObject visitVariableExpr( Variable& expr) = 0;
@@ -163,6 +170,21 @@ class Super: public Expr {
 		}
 		Token keyword;
 		Token method;
+};
+
+class Ternary: public Expr {
+	public:
+		Ternary(std::unique_ptr<Expr>&& condition_, std::unique_ptr<Expr>&& thenBranch_, std::unique_ptr<Expr>&& elseBranch_) {
+			condition = std::move (condition_);
+			thenBranch = std::move (thenBranch_);
+			elseBranch = std::move (elseBranch_);
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitTernaryExpr(*this);
+		}
+		std::unique_ptr<Expr> condition;
+		std::unique_ptr<Expr> thenBranch;
+		std::unique_ptr<Expr> elseBranch;
 };
 
 class This: public Expr {
