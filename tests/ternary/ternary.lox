@@ -3,4 +3,8 @@ var b = 3;
 
 var max = a > b ? a : b;
 
-print max;
+var other = a == b ? a : b; 
+
+print max; // should print 5
+
+print other; // should print 3

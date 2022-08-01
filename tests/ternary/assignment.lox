@@ -1,0 +1,14 @@
+var a = 5;
+var b = 3;
+var max;
+
+// seems C does not allow assignment inside operator ?:
+// but C++ does. We support it mainly because it is 
+// the easiest path I think lol. Was lazy doing the 
+// other way around.
+
+var d = a > b ? max = a : max = b;
+
+print max; // should print 5
+
+print d; // should print 3
