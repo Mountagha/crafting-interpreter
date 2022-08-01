@@ -135,8 +135,7 @@ LoxObject Interpreter::visitThisExpr(This& expr) {
 
 LoxObject Interpreter::visitTernaryExpr(Ternary& expr) {
     return evaluate(expr.condition) ? evaluate(expr.thenBranch)
-                                    : evaluate(expr.thenBranch);
-    
+                                    : evaluate(expr.elseBranch);
 }
 
 LoxObject Interpreter::visitGroupingExpr(Grouping& expr) {

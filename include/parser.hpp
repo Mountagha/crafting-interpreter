@@ -225,7 +225,7 @@ class Parser {
                     auto getExpr = std::unique_ptr<Get>(static_cast<Get*>(expr.release()));
                     return std::make_unique<Set>(std::move(getExpr->object), getExpr->name, std::move(value));
                 } 
-                Lox::error(equals, "Invalid assigment target.");
+                Lox::error(equals, "Invalid assignment target.");
             }
             return expr;
         }
@@ -234,6 +234,7 @@ class Parser {
             PExpr expr = Or();
             
             if (match ({QUESTION_MARK})) {
+                //expr = ternary();
                 PExpr thenBranch = expression();
                 consume(COLON, "Expect ':' after expression in ternary.");
                 PExpr elseBranch = expression();

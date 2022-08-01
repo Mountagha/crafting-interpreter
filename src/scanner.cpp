@@ -4,7 +4,7 @@
 namespace lox {
 
 Scanner::Scanner(const std::string& source): 
-    source{source}, start{0}, current{0}, line{1} 
+    source{source}, start{0}, current{0}, line{0} 
 {}
 
 std::vector<Token> Scanner::scanTokens() {
