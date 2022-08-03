@@ -15,6 +15,7 @@ namespace lox {
 class Assign;
 class Binary;
 class Call;
+class CommaExpr;
 class Get;
 class Grouping;
 class Literal;
@@ -31,6 +32,7 @@ class ExprVisitor {
 		virtual LoxObject visitAssignExpr( Assign& expr) = 0;
 		virtual LoxObject visitBinaryExpr( Binary& expr) = 0;
 		virtual LoxObject visitCallExpr( Call& expr) = 0;
+		virtual LoxObject visitCommaExprExpr( CommaExpr& expr) = 0;
 		virtual LoxObject visitGetExpr( Get& expr) = 0;
 		virtual LoxObject visitGroupingExpr( Grouping& expr) = 0;
 		virtual LoxObject visitLiteralExpr( Literal& expr) = 0;
@@ -92,6 +94,17 @@ class Call: public Expr {
 		std::unique_ptr<Expr> callee;
 		Token paren;
 		std::vector<std::unique_ptr<Expr>> arguments;
+};
+
+class CommaExpr: public Expr {
+	public:
+		CommaExpr(std::unique_ptr<Expr>&& expression_) {
+			expression = std::move (expression_);
+		}
+		LoxObject accept(ExprVisitor& visitor) override {
+			return visitor.visitCommaExprExpr(*this);
+		}
+		std::unique_ptr<Expr> expression;
 };
 
 class Get: public Expr {

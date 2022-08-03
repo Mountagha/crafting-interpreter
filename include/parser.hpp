@@ -26,7 +26,8 @@ class Parser {
         unsigned int current;
 
         PExpr expression() {
-            return assignment();
+            //return assignment();
+            return CommaBlock();
         }
 
         SExpr declaration() {
@@ -215,7 +216,8 @@ class Parser {
 
             if (match ({EQUAL})) {
                 Token equals = previous();
-                PExpr value = assignment();
+                //PExpr value = assignment();
+                PExpr value = CommaBlock();
 
                 TypeIdentifier identifier{};
                 if (identifier.identify(expr) == Type::Variable) {
@@ -234,7 +236,6 @@ class Parser {
             PExpr expr = Or();
             
             if (match ({QUESTION_MARK})) {
-                //expr = ternary();
                 PExpr thenBranch = expression();
                 consume(COLON, "Expect ':' after expression in ternary.");
                 PExpr elseBranch = expression();
@@ -376,6 +377,18 @@ class Parser {
             }
 
             return expr;
+        }
+
+        PExpr CommaBlock() {
+            PExpr expr = assignment();
+            if (match ({COMMA})) {
+                do {
+                    expr = expression();
+                } while(match ({COMMA}) && !isAtEnd());
+
+                return std::make_unique<CommaExpr>(std::move(expr));
+            }
+            return expr; 
         }
 
         PExpr finishCall(PExpr& callee) {

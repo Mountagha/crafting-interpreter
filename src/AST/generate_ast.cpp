@@ -174,6 +174,7 @@ int main(int argc, char *argv[]) {
     std::map<std::string, std::string> expr_map {
         {"Binary", "Expr* left, Token operator_, Expr* right"},
         {"Call", "Expr* callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments"},
+        {"CommaExpr", "Expr* expression"},
         {"Get", "Expr* object, Token name"},
         {"Assign", "Token name, Expr* value"},
         {"Grouping", "Expr* expression"},

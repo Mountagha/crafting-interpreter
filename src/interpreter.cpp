@@ -196,6 +196,10 @@ LoxObject Interpreter::visitCallExpr(Call& expr) {
     return callee(*this, arguments);
 }
 
+LoxObject Interpreter::visitCommaExprExpr(CommaExpr& expr) {
+    return evaluate(expr.expression);
+}
+
 LoxObject Interpreter::visitGetExpr(Get& expr) {
     LoxObject object = evaluate(expr.object);
     return object.get(expr.name);
