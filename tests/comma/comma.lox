@@ -1,8 +1,16 @@
-var a = 5;
-var b = 10;
-//var c;
-//var c = (a,b);
-var c = a,b;
-print c;
+var a;
+a = 1, 2;
 print a;
-print b;
+a = (1, 2);
+print a;
+//var b = 2;
+//var c = 3;
+//var d = (a,b, c); // should be 3
+//var e;
+//e = a, b, c; 
+//print e; // should be 1
+//e = (a, b, c); 
+//print e; // should print 3
+//print a;
+//print b;
+//print c;

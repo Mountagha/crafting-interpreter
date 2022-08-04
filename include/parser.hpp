@@ -27,7 +27,12 @@ class Parser {
 
         PExpr expression() {
             //return assignment();
-            return CommaBlock();
+            //return CommaBlock();
+            PExpr expr = assignment();
+            if(match ({COMMA})) {
+                CommaBlock();
+            }
+            return expr;
         }
 
         SExpr declaration() {
@@ -196,7 +201,7 @@ class Parser {
             }
             consume(RIGHT_PARENT, "Expect ')' after parameteres.");
 
-            consume(LEFT_BRACE, "Expect ')' before " + kind + " body.");
+            consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
             std::vector<SExpr> body = block();
             return std::make_unique<Function>(name, std::move(parameters), std::move(body));
         }
@@ -216,8 +221,7 @@ class Parser {
 
             if (match ({EQUAL})) {
                 Token equals = previous();
-                //PExpr value = assignment();
-                PExpr value = CommaBlock();
+                PExpr value = assignment();
 
                 TypeIdentifier identifier{};
                 if (identifier.identify(expr) == Type::Variable) {
@@ -380,15 +384,12 @@ class Parser {
         }
 
         PExpr CommaBlock() {
-            PExpr expr = assignment();
-            if (match ({COMMA})) {
-                do {
-                    expr = expression();
-                } while(match ({COMMA}) && !isAtEnd());
-
-                return std::make_unique<CommaExpr>(std::move(expr));
-            }
-            return expr; 
+            PExpr expr;
+            do {
+                expr = expression();
+            } while(match ({COMMA}) && !isAtEnd());
+            //return std::make_unique<CommaExpr>(std::move(expr));
+            return expr;
         }
 
         PExpr finishCall(PExpr& callee) {
