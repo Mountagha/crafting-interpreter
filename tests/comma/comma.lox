@@ -1,0 +1,13 @@
+var a = 1;
+var b = 2;
+var c = 3;
+var e;
+e = a, b, c; 
+print e; // should be 1
+e = (a, b, c); 
+print e; // should print 3
+
+var d;
+d = a, c = b;
+print d; // should print 1
+print c; // should print 2

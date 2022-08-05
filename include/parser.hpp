@@ -24,16 +24,23 @@ class Parser {
 
         std::vector<Token> tokens;
         unsigned int current;
+        //We use the boolean variable below to prevent commaOperator to parse inside function call. 
+        // or on Maybe there's a better way to do that ? I DUNNO.
+        bool isCall{false}; // 
 
         PExpr expression() {
-            return assignment();
+            PExpr expr = assignment();
+            if(check(COMMA) && !isCall) {
+                return CommaBlock(std::move(expr));
+            }
+            return expr;
         }
 
         SExpr declaration() {
             try {
                 if (match ({CLASS})) return classDeclaration();
                 if (match ({FUN})) return function("function");
-                if (match ({VAR})) return varDeclaration();
+                if (match ({VAR})) return varDeclaration(); 
 
                 return statement();
             } catch (ParseError error) {
@@ -156,7 +163,8 @@ class Parser {
 
             PExpr initializer;
             if (match ({EQUAL})) {
-                initializer = expression();
+                initializer = assignment(); //we changed expression() by assignment
+                // just to avoid code like [var x = 1, 2, 3;]
             }
 
             consume(SEMICOLON, "Expect ';' after variable declaration.");
@@ -195,7 +203,7 @@ class Parser {
             }
             consume(RIGHT_PARENT, "Expect ')' after parameteres.");
 
-            consume(LEFT_BRACE, "Expect ')' before " + kind + " body.");
+            consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
             std::vector<SExpr> body = block();
             return std::make_unique<Function>(name, std::move(parameters), std::move(body));
         }
@@ -234,7 +242,6 @@ class Parser {
             PExpr expr = Or();
             
             if (match ({QUESTION_MARK})) {
-                //expr = ternary();
                 PExpr thenBranch = expression();
                 consume(COLON, "Expect ':' after expression in ternary.");
                 PExpr elseBranch = expression();
@@ -365,6 +372,7 @@ class Parser {
 
             while (true){
                 if (match ({LEFT_PAREN})) {
+                    isCall = true;
                     expr = finishCall(expr);
                 } else if (match ({DOT})) {
                     Token name = consume(IDENTIFIER,
@@ -378,6 +386,18 @@ class Parser {
             return expr;
         }
 
+        PExpr CommaBlock(PExpr&& left_hand) {
+            consume(COMMA, "Expect ',' while parsing comma block.");
+            std::vector<PExpr> commaExps; 
+            commaExps.push_back(std::move(left_hand));
+
+            do {
+                commaExps.push_back(expression());
+            } while(match ({COMMA}) && !isAtEnd());
+
+            return std::make_unique<CommaExpr>(std::move(commaExps));
+        }
+
         PExpr finishCall(PExpr& callee) {
             std::vector<PExpr> arguments;
             if (!check(RIGHT_PARENT)) {
@@ -388,7 +408,7 @@ class Parser {
                     arguments.push_back(expression());
                 } while(match({COMMA}));
             }
-            
+            isCall = false; 
             Token paren = consume(RIGHT_PARENT, "Expect ')' after arguments.");
             return std::make_unique<Call>(std::move(callee), paren, std::move(arguments));
         }
