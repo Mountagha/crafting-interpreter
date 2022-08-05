@@ -149,7 +149,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         }
 
         LoxObject visitCommaExprExpr(CommaExpr& expr) override {
-            resolve(expr.expression);
+            for (auto& arg : expr.expressions)
+            resolve(arg);
             return LoxObject();
         }
 

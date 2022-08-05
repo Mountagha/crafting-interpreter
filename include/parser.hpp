@@ -24,15 +24,17 @@ class Parser {
 
         std::vector<Token> tokens;
         unsigned int current;
+        bool inCall{false}; // We use this variable to prevent commaOperator to parse inside function call. 
+        // Maybe there's a better way to do that ? I DUNNO.
 
         PExpr expression() {
             //return assignment();
-            return CommaBlock();
-            //PExpr expr = assignment();
-            //if(match ({COMMA})) {
-            //    return CommaBlock();
-            //}
-            //return expr;
+            //return CommaBlock();
+            PExpr expr = assignment();
+            if(check(COMMA) && !inCall) {
+                return CommaBlock(std::move(expr));
+            }
+            return expr;
         }
 
         SExpr declaration() {
@@ -370,6 +372,7 @@ class Parser {
 
             while (true){
                 if (match ({LEFT_PAREN})) {
+                    inCall = true;
                     expr = finishCall(expr);
                 } else if (match ({DOT})) {
                     Token name = consume(IDENTIFIER,
@@ -383,16 +386,17 @@ class Parser {
             return expr;
         }
 
-        PExpr CommaBlock() {
-            PExpr expr = assignment();
-            if(match ({COMMA})){
-
+        PExpr CommaBlock(PExpr&& left_hand) {
+            //PExpr expr = assignment();
+            //if(match ({COMMA})){ // we do comma parsing only if not in a func call.
+                consume(COMMA, "Expect ',' while parsing comma block.");
+                std::vector<PExpr> commaExps; 
+                commaExps.push_back(std::move(left_hand));
                 do {
-                    expr = expression();
+                    commaExps.push_back(expression());
                 } while(match ({COMMA}) && !isAtEnd());
-                return std::make_unique<CommaExpr>(std::move(expr));
-            }
-            return expr;
+            //}
+            return std::make_unique<CommaExpr>(std::move(commaExps));
         }
 
         PExpr finishCall(PExpr& callee) {
@@ -405,7 +409,7 @@ class Parser {
                     arguments.push_back(expression());
                 } while(match({COMMA}));
             }
-            
+            inCall = false; 
             Token paren = consume(RIGHT_PARENT, "Expect ')' after arguments.");
             return std::make_unique<Call>(std::move(callee), paren, std::move(arguments));
         }

@@ -197,7 +197,10 @@ LoxObject Interpreter::visitCallExpr(Call& expr) {
 }
 
 LoxObject Interpreter::visitCommaExprExpr(CommaExpr& expr) {
-    return evaluate(expr.expression);
+    for (int i = 0; i < expr.expressions.size() - 1; i++) {
+        evaluate(expr.expressions[i]);
+    }
+    return evaluate(expr.expressions.back()); // we only need to return the rightmost expression 
 }
 
 LoxObject Interpreter::visitGetExpr(Get& expr) {

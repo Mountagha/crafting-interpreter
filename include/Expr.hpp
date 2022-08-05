@@ -98,13 +98,13 @@ class Call: public Expr {
 
 class CommaExpr: public Expr {
 	public:
-		CommaExpr(std::unique_ptr<Expr>&& expression_) {
-			expression = std::move (expression_);
+		CommaExpr(std::vector<std::unique_ptr<Expr>>&& expressions_) {
+			expressions = std::move (expressions_);
 		}
 		LoxObject accept(ExprVisitor& visitor) override {
 			return visitor.visitCommaExprExpr(*this);
 		}
-		std::unique_ptr<Expr> expression;
+		std::vector<std::unique_ptr<Expr>> expressions;
 };
 
 class Get: public Expr {
