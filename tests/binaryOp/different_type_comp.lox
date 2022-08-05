@@ -1,0 +1,6 @@
+var a = "mount";
+var b = "bah";
+print 4 + b; // Expect to print 4bah
+
+print 4 > a; // Expect runtime_error("only object of same type can be well ordered.")
+
