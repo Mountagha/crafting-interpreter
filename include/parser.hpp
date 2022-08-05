@@ -27,12 +27,12 @@ class Parser {
 
         PExpr expression() {
             //return assignment();
-            //return CommaBlock();
-            PExpr expr = assignment();
-            if(match ({COMMA})) {
-                CommaBlock();
-            }
-            return expr;
+            return CommaBlock();
+            //PExpr expr = assignment();
+            //if(match ({COMMA})) {
+            //    return CommaBlock();
+            //}
+            //return expr;
         }
 
         SExpr declaration() {
@@ -384,11 +384,14 @@ class Parser {
         }
 
         PExpr CommaBlock() {
-            PExpr expr;
-            do {
-                expr = expression();
-            } while(match ({COMMA}) && !isAtEnd());
-            //return std::make_unique<CommaExpr>(std::move(expr));
+            PExpr expr = assignment();
+            if(match ({COMMA})){
+
+                do {
+                    expr = expression();
+                } while(match ({COMMA}) && !isAtEnd());
+                return std::make_unique<CommaExpr>(std::move(expr));
+            }
             return expr;
         }
 
