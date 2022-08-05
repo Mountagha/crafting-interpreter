@@ -29,8 +29,6 @@ class Parser {
         bool isCall{false}; // 
 
         PExpr expression() {
-            //return assignment();
-            //return CommaBlock();
             PExpr expr = assignment();
             if(check(COMMA) && !isCall) {
                 return CommaBlock(std::move(expr));
@@ -389,15 +387,14 @@ class Parser {
         }
 
         PExpr CommaBlock(PExpr&& left_hand) {
-            //PExpr expr = assignment();
-            //if(match ({COMMA})){ // we do comma parsing only if not in a func call.
-                consume(COMMA, "Expect ',' while parsing comma block.");
-                std::vector<PExpr> commaExps; 
-                commaExps.push_back(std::move(left_hand));
-                do {
-                    commaExps.push_back(expression());
-                } while(match ({COMMA}) && !isAtEnd());
-            //}
+            consume(COMMA, "Expect ',' while parsing comma block.");
+            std::vector<PExpr> commaExps; 
+            commaExps.push_back(std::move(left_hand));
+
+            do {
+                commaExps.push_back(expression());
+            } while(match ({COMMA}) && !isAtEnd());
+
             return std::make_unique<CommaExpr>(std::move(commaExps));
         }
 
