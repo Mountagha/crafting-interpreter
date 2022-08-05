@@ -1,0 +1,5 @@
+var a = "mount";
+var b = "bah";
+print 4 + b; // Expect to print 4bah
+
+print 2/0; // Expect runtime_error("Attempted a division by Zero.")
