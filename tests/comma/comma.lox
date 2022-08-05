@@ -1,24 +1,13 @@
 var a = 1;
-//a = 1, 2;
-//print a;
-//a = (1, 2);
-//print a;
 var b = 2;
 var c = 3;
-//var d = (a,b, c); // should be 3
 var e;
 e = a, b, c; 
 print e; // should be 1
 e = (a, b, c); 
 print e; // should print 3
-//print a;
-//print b;
-//print c;
 
-// function with parameters
-fun say_hi(first, last) {
-  print "Hi, " + first + " " + last + "!";
-}
-
-// call
-say_hi("Dear", "Mountagha");
+var d;
+d = a, c = b;
+print d; // should print 1
+print c; // should print 2
