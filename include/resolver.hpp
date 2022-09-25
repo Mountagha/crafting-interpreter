@@ -19,6 +19,15 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             for (auto& statement : statements ) {
                 resolve(statement);
             }
+
+            // report unused variables
+            for (auto& current_scope: var_initializations) {
+                for (auto it = current_scope.begin(); it != current_scope.end(); it++) {
+                    if (!it->second) {
+                        std::cout << it->first << " declared but not used.\n";
+                    }
+                }
+            }
         }
 
         void visitBlockStmt(Block& stmt) override {
@@ -76,7 +85,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 resolve(stmt.initializer);
             }
             define(stmt.name);
-            var_initializations[stmt.name.lexeme] = false;
+            var_initializations.back()[stmt.name.lexeme] = false;
         }
 
         LoxObject visitVariableExpr(Variable& expr) override {
@@ -86,8 +95,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                     Lox::error(expr.name, 
                         "Can't read local variable in its own initializer");
             }
-            if (var_initializations.find(expr.name.lexeme) != var_initializations.end()) {
-                var_initializations[expr.name.lexeme] = true;
+            if (var_initializations.back().find(expr.name.lexeme) != var_initializations.back().end()) {
+                var_initializations.back()[expr.name.lexeme] = true;
             }
 
             resolveLocal(expr, expr.name);
@@ -233,7 +242,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         FunctionType currentFunction {FunctionType::NONE};
         Interpreter* interpreter;
         std::vector<std::map<std::string, bool>> scopes {};
-        std::map<std::string, bool> var_initializations {};
+        std::vector<std::map<std::string, bool>>  var_initializations {};
 
         void resolve(SExpr& stmt) {
             stmt->accept(*this);
@@ -245,6 +254,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
 
         void beginScope() {
             scopes.push_back({});
+            var_initializations.push_back({});
         }
 
         void endScope() {
