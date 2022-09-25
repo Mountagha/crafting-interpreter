@@ -76,6 +76,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 resolve(stmt.initializer);
             }
             define(stmt.name);
+            var_initializations[stmt.name.lexeme] = false;
         }
 
         LoxObject visitVariableExpr(Variable& expr) override {
@@ -84,6 +85,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 scopes.back().at(expr.name.lexeme) == false) {
                     Lox::error(expr.name, 
                         "Can't read local variable in its own initializer");
+            }
+            if (var_initializations.find(expr.name.lexeme) != var_initializations.end()) {
+                var_initializations[expr.name.lexeme] = true;
             }
 
             resolveLocal(expr, expr.name);
@@ -229,6 +233,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         FunctionType currentFunction {FunctionType::NONE};
         Interpreter* interpreter;
         std::vector<std::map<std::string, bool>> scopes {};
+        std::map<std::string, bool> var_initializations {};
 
         void resolve(SExpr& stmt) {
             stmt->accept(*this);
