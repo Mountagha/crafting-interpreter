@@ -16,15 +16,20 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         Resolver(Interpreter* intp): interpreter{intp} {}
 
         void resolve(std::vector<SExpr>& statements) {
+
             for (auto& statement : statements ) {
                 resolve(statement);
             }
 
+        }
+
+        void reportUnusedVariables() {
+
             // report unused variables
-            for (auto& current_scope: var_initializations) {
-                for (auto it = current_scope.begin(); it != current_scope.end(); it++) {
+            for (auto& scope: var_initializations) {
+                for (auto it = scope.begin(); it != scope.end(); it++) {
                     if (!it->second) {
-                        std::cout << it->first << " declared but not used.\n";
+                        std::cout << "variable " << it->first << " declared but unused.\n";
                     }
                 }
             }
@@ -95,9 +100,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                     Lox::error(expr.name, 
                         "Can't read local variable in its own initializer");
             }
-            if (var_initializations.back().find(expr.name.lexeme) != var_initializations.back().end()) {
-                var_initializations.back()[expr.name.lexeme] = true;
-            }
+            var_initializations.back()[expr.name.lexeme] = true;
 
             resolveLocal(expr, expr.name);
             return LoxObject();
