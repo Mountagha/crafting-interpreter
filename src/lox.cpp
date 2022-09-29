@@ -61,6 +61,7 @@ namespace lox
         Resolver resolver(&interpreter);
 
         resolver.resolve(statements);
+        resolver.reportUnusedVariables(); 
 
         // Stop if there was a resolution error.
         if (hadError) return;

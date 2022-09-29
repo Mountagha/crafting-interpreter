@@ -16,8 +16,22 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         Resolver(Interpreter* intp): interpreter{intp} {}
 
         void resolve(std::vector<SExpr>& statements) {
+
             for (auto& statement : statements ) {
                 resolve(statement);
+            }
+
+        }
+
+        void reportUnusedVariables() {
+
+            // report unused variables
+            for (auto& scope: var_initializations) {
+                for (auto it = scope.begin(); it != scope.end(); it++) {
+                    if (!it->second) {
+                        std::cout << "variable " << it->first << " declared but unused.\n";
+                    }
+                }
             }
         }
 
@@ -76,6 +90,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 resolve(stmt.initializer);
             }
             define(stmt.name);
+            var_initializations.back()[stmt.name.lexeme] = false;
         }
 
         LoxObject visitVariableExpr(Variable& expr) override {
@@ -85,6 +100,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                     Lox::error(expr.name, 
                         "Can't read local variable in its own initializer");
             }
+            var_initializations.back()[expr.name.lexeme] = true;
 
             resolveLocal(expr, expr.name);
             return LoxObject();
@@ -229,6 +245,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         FunctionType currentFunction {FunctionType::NONE};
         Interpreter* interpreter;
         std::vector<std::map<std::string, bool>> scopes {};
+        std::vector<std::map<std::string, bool>>  var_initializations {};
 
         void resolve(SExpr& stmt) {
             stmt->accept(*this);
@@ -240,6 +257,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
 
         void beginScope() {
             scopes.push_back({});
+            var_initializations.push_back({});
         }
 
         void endScope() {

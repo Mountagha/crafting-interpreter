@@ -1,0 +1,37 @@
+{
+    var a = 1;
+    print a;    // should print 1.
+    {
+        var b = 2;  
+        print b;    // should print 2.
+        {
+            var c = 3;
+            //print c;    // should print c unused.
+        }
+    }
+}
+
+{
+    var a = 1;
+    print a;    
+    {
+        var b = 2;  
+        print b;    // should print 2.
+        {
+            var c = b;
+            //print c;    // should another C unused
+        }
+    }
+}
+
+{
+    var a = 1;
+    print a;    
+    {
+        var b = 2;  
+        {
+            var c = b;
+            print c;    // should b unused
+        }
+    }
+}
