@@ -1,0 +1,10 @@
+var x = 2;
+{
+    var y = "inner";
+    {
+        print y;
+        print x;
+    }
+}
+
+// Wanna test variable array indexation instead of map looking.
