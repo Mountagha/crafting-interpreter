@@ -96,7 +96,7 @@ LoxInstance* Interpreter::createInstance(LoxClass* loxklass) {
     return instancePtr;
 }
 
-void Interpreter::resolve(Expr* expr, unsigned int depth) {
+void Interpreter::resolve(Expr* expr, unsigned int depth, int index=-1) {
     locals.insert({expr, depth});
 }
 
