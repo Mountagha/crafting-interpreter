@@ -96,8 +96,8 @@ LoxInstance* Interpreter::createInstance(LoxClass* loxklass) {
     return instancePtr;
 }
 
-void Interpreter::resolve(Expr* expr, unsigned int depth, int index=-1) {
-    locals.insert({expr, depth});
+void Interpreter::resolve(Expr* expr, unsigned int depth, int index) {
+    locals.insert({expr, std::make_pair(depth, index)});
 }
 
 LoxObject Interpreter::visitLiteralExpr(Literal& expr) {
@@ -123,9 +123,9 @@ LoxObject Interpreter::visitSetExpr(Set& expr) {
 }
 
 LoxObject Interpreter::visitSuperExpr(Super& expr) {
-    auto distance = locals[&expr];
-    auto superclass = environment->getAt(distance, "super");
-    auto object = environment->getAt(distance - 1, "this");
+    auto resolv = locals[&expr];
+    auto superclass = environment->getAt(resolv.first, "super");
+    auto object = environment->getAt(resolv.first - 1, "this");
     return superclass.getLoxClass()->function(expr.method, object.getInstance());
 }
 
@@ -217,7 +217,7 @@ LoxObject Interpreter::visitVariableExpr(Variable& expr) {
 LoxObject Interpreter::visitAssignExpr(Assign& expr) {
     LoxObject value = evaluate(expr.value);
     if (locals.find(&expr) != locals.end()) {
-        unsigned int distance = locals[&expr];
+        unsigned int distance = locals[&expr].first;
         environment->assignAt(distance, expr.name, value);
     } else {
         globals->assign(expr.name, value);

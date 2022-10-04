@@ -63,11 +63,11 @@ class Resolver : public ExprVisitor, public StmtVisitor {
 
             if (stmt.superclass) {
                 beginScope();
-                scopes.back()["super"] = true;
+                scopes.back()["super"] = std::make_pair(true, -1);
             }
 
             beginScope();
-            scopes.back()["this"] = true;
+            scopes.back()["this"] = std::make_pair(true, -1);
 
             for (auto& method: stmt.methods) {
                 FunctionType declaration = FunctionType::METHOD;
@@ -90,13 +90,14 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 resolve(stmt.initializer);
             }
             define(stmt.name);
+            if (!var_initializations.empty()) 
             var_initializations.back()[stmt.name.lexeme] = false;
         }
 
         LoxObject visitVariableExpr(Variable& expr) override {
             if (!scopes.empty() &&
                 scopes.back().find(expr.name.lexeme) != scopes.back().end() && 
-                scopes.back().at(expr.name.lexeme) == false) {
+                scopes.back().at(expr.name.lexeme).first == false) {
                     Lox::error(expr.name, 
                         "Can't read local variable in its own initializer");
             }
@@ -244,8 +245,10 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         ClassType currentClass {ClassType::NONE};
         FunctionType currentFunction {FunctionType::NONE};
         Interpreter* interpreter;
-        std::vector<std::map<std::string, bool>> scopes {};
+        std::vector<std::map<std::string, std::pair<bool, int>>> scopes {};
         std::vector<std::map<std::string, bool>>  var_initializations {};
+
+        int local_index = 0;
 
         void resolve(SExpr& stmt) {
             stmt->accept(*this);
@@ -258,6 +261,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         void beginScope() {
             scopes.push_back({});
             var_initializations.push_back({});
+            local_index = 0;
         }
 
         void endScope() {
@@ -270,19 +274,20 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             if (scopes.back().find(name.lexeme) != scopes.back().end()) {
                 Lox::error(name, "Already a variable with this name in this scope.");
             }
-            scopes.back()[name.lexeme] = false;
+            scopes.back()[name.lexeme] = std::make_pair(false, local_index);
+            local_index++;
         }
 
         void define(Token name) {
             if (scopes.empty()) return;
-            scopes.back()[name.lexeme] = true;
+            scopes.back()[name.lexeme].first = true;
         }
 
         void resolveLocal(Expr& expr, Token name) {
             unsigned int scope_depth = 0; 
             for (auto r_iter = scopes.rbegin(); r_iter != scopes.rend(); r_iter++) {
                 if (r_iter->find(name.lexeme) != r_iter->end()) {
-                    interpreter->resolve(&expr, scope_depth);
+                    interpreter->resolve(&expr, scope_depth, r_iter->at(name.lexeme).second);
                     return;
                 }  
                 scope_depth++;

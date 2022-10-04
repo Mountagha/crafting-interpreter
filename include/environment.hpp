@@ -19,7 +19,7 @@ class Environment : public std::enable_shared_from_this<Environment>{
         void assign(Token name, LoxObject value);
         static PEnvironment createNew(PEnvironment encl);
         static PEnvironment copy(PEnvironment env, PEnvironment encl);
-        LoxObject getAt(unsigned int distance, std::string name);
+        LoxObject getAt(unsigned int distance, std::string name, int index=-1);
         void assignAt(unsigned int distance, Token name, LoxObject value);
         PEnvironment ancestor(unsigned int distance);
         PEnvironment copy();
@@ -30,6 +30,7 @@ class Environment : public std::enable_shared_from_this<Environment>{
         PEnvironment enclosing;
     private:
         std::unordered_map<std::string, LoxObject> values{}; 
+        std::vector<LoxObject> my_values{};
 };
 
 class ScopeEnvironment {

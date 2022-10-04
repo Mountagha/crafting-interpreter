@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream> // debug
 #include "environment.hpp"
 
 namespace lox {
@@ -14,17 +15,20 @@ PEnvironment Environment::createNew(PEnvironment encl) {
 PEnvironment Environment::copy(PEnvironment env, PEnvironment encl) {
     auto newEnv = createNew(encl);
     newEnv->values = env->values;
+    newEnv->my_values = env->my_values;
     return newEnv;
 }
 
 PEnvironment Environment::copy() {
     auto newEnv = createNew(enclosing);
     newEnv->values = values;
+    newEnv->my_values = my_values;
     return newEnv;
 }
 
 void Environment::define(std::string s, LoxObject value) {
     values.insert_or_assign(s, value);
+    my_values.push_back(value);
 }
 
 PEnvironment Environment::ancestor(unsigned int distance) {
@@ -35,7 +39,11 @@ PEnvironment Environment::ancestor(unsigned int distance) {
     return environment;
 }
 
-LoxObject Environment::getAt(unsigned int distance, std::string name) {
+LoxObject Environment::getAt(unsigned int distance, std::string name, int index) {
+    if (index != -1) {
+        std::cout << "here";
+        std::cout << ancestor(distance)->my_values.at(index);
+    }
     return ancestor(distance)->values.at(name);
 }
 

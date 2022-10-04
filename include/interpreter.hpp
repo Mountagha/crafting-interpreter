@@ -61,13 +61,13 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
 
         void interpret(std::vector<std::unique_ptr<Stmt>>& statements);
         void executeBlock(std::vector<std::unique_ptr<Stmt>>& statements, PEnvironment Environment); 
-        void resolve(Expr* expr, unsigned int depth);
+        void resolve(Expr* expr, unsigned int depth, int index=-1);
     
     private:
 
         PEnvironment globals;
         PEnvironment environment;
-        std::map<Expr*, unsigned int> locals {};
+        std::map<Expr*, std::pair<unsigned int, int>> locals {};
 
         std::map<LoxCallable*, std::pair<std::unique_ptr<LoxCallable>, size_t>> m_callables;
         std::map<LoxClass*, std::pair<std::unique_ptr<LoxClass>, size_t>> m_classes;
@@ -88,8 +88,9 @@ class Interpreter : public ExprVisitor, public  StmtVisitor{
 
         LoxObject lookUpVariable(Token name, Expr* expr) {
             if (locals.find(expr) != locals.end()) {
-                auto distance = locals.at(expr);
-                return environment->getAt(distance, name.lexeme);
+                //auto distance = locals.at(expr);
+                auto resolv = locals.at(expr);
+                return environment->getAt(resolv.first, name.lexeme, resolv.second);
             } else {
                 return globals->get(name);
             }
