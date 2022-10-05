@@ -90,8 +90,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 resolve(stmt.initializer);
             }
             define(stmt.name);
-            if (!var_initializations.empty()) 
-            var_initializations.back()[stmt.name.lexeme] = false;
+            if (!var_initializations.empty()) { 
+                var_initializations.back()[stmt.name.lexeme] = false;
+            }
         }
 
         LoxObject visitVariableExpr(Variable& expr) override {
@@ -101,7 +102,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                     Lox::error(expr.name, 
                         "Can't read local variable in its own initializer");
             }
-            var_initializations.back()[expr.name.lexeme] = true;
+            if (!var_initializations.empty()) {
+                var_initializations.back()[expr.name.lexeme] = true;
+            }
 
             resolveLocal(expr, expr.name);
             return LoxObject();

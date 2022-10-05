@@ -41,8 +41,7 @@ PEnvironment Environment::ancestor(unsigned int distance) {
 
 LoxObject Environment::getAt(unsigned int distance, std::string name, int index) {
     if (index != -1) {
-        std::cout << "here";
-        std::cout << ancestor(distance)->my_values.at(index);
+        return ancestor(distance)->my_values.at(index);
     }
     return ancestor(distance)->values.at(name);
 }
