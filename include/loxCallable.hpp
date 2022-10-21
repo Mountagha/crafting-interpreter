@@ -39,7 +39,7 @@ class TimeFunction : public LoxCallable {
 
 class LoxFunction : public LoxCallable {
     public:
-        LoxFunction(Function* declaration, Interpreter* inpt, PEnvironment encl, bool isInit = false);
+        LoxFunction(Function* declaration, Interpreter* intp, PEnvironment encl, bool isInit = false);
         LoxFunction(LoxFunction& other, PEnvironment encl);
         ~LoxFunction();
         size_t arity() const override { return declaration->params.size(); }
