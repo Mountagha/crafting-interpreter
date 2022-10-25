@@ -60,10 +60,21 @@ class LoxFunction : public LoxCallable {
         Interpreter* interpreter;
         PEnvironment enclosing;
 };
+class LoxClass;
 
-class LoxInstance;
+class LoxInstance {
+    public:
+        LoxInstance(LoxClass* klass_); 
+        std::string name() const { return "<instance " + cname.lexeme + ">"; }
+        LoxObject get(Token name);
+        LoxObject set(Token name, LoxObject value);
+    private:
+        LoxClass* klass; 
+        Token cname;
+        std::map<std::string, LoxObject> fields {};
+};
 
-class LoxClass : public LoxCallable {
+class LoxClass : public LoxCallable, public LoxInstance {
     public:
         LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnvironment encl);
         std::string name() const override { return "<class " + cname.lexeme + ">"; }
@@ -77,18 +88,6 @@ class LoxClass : public LoxCallable {
         std::map<std::string, LoxObject> methods {};
         friend class LoxInstance;
 
-};
-
-class LoxInstance {
-    public:
-        LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
-        std::string name() const { return "<instance " + cname.lexeme + ">"; }
-        LoxObject get(Token name);
-        LoxObject set(Token name, LoxObject value);
-    private:
-        LoxClass* klass; 
-        Token cname;
-        std::map<std::string, LoxObject> fields {};
 };
 
 } // lox namespace

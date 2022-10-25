@@ -90,6 +90,7 @@ size_t LoxClass::arity() const {
     }
     return 0;
 }
+ LoxInstance::LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
 
 LoxObject LoxInstance::get(Token name) {
     auto value = fields.find(name.lexeme);
