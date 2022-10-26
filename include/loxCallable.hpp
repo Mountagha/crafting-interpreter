@@ -64,6 +64,7 @@ class LoxClass;
 
 class LoxInstance {
     public:
+        LoxInstance() = default;
         LoxInstance(LoxClass* klass_); 
         std::string name() const { return "<instance " + cname.lexeme + ">"; }
         LoxObject get(Token name);

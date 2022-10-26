@@ -44,7 +44,6 @@ LoxClass::LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnviro
     super = superClass;
     interpreter = intp;
     bool isInit {false};
-
     for (auto& m: stmt->methods) {
         isInit = m->name.lexeme == "init" ? true : false;
         auto* method = interpreter->createFunction(m.get(), encl, isInit);
@@ -90,7 +89,9 @@ size_t LoxClass::arity() const {
     }
     return 0;
 }
- LoxInstance::LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
+
+
+LoxInstance::LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
 
 LoxObject LoxInstance::get(Token name) {
     auto value = fields.find(name.lexeme);

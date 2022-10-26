@@ -238,7 +238,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             NONE,
             FUNCTION,
             INITIALIZER,
-            METHOD
+            METHOD,
+            CLASS_METHOD
         };
         
         ClassType currentClass {ClassType::NONE};
