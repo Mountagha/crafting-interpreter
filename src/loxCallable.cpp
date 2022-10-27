@@ -49,6 +49,12 @@ LoxClass::LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnviro
         auto* method = interpreter->createFunction(m.get(), encl, isInit);
         methods[m->name.lexeme] = LoxObject(method, intp);
     }
+
+    for (auto& m: stmt->class_methods) {
+        auto* class_method = interpreter->createFunction(m.get(), encl);
+        class_methods[m->name.lexeme] = LoxObject(class_method, intp);
+    }
+
 }
 
 LoxObject LoxClass::function(Token name, LoxInstance* instance) {
@@ -66,6 +72,22 @@ LoxObject LoxClass::function(Token name, LoxInstance* instance) {
     // maybe create later a custom runtimeError in order to print
     // the line and/or the file along with the error message.
 }
+
+LoxObject LoxClass::class_function(Token name) {
+    // possible leak in this function. Check later.
+    auto var = class_methods.find(name.lexeme);
+    if (var != class_methods.end()) {
+        LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction()); 
+        PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
+        auto* new_method = interpreter->createFunction(func, environment); 
+        return LoxObject(new_method, interpreter);
+    }
+    if (super) return super->class_function(name); 
+    throw std::runtime_error("Undefined property '" + name.lexeme + "'.");
+    // maybe create later a custom runtimeError in order to print
+    // the line and/or the file along with the error message.
+}
+
 
 LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
 
@@ -88,6 +110,18 @@ size_t LoxClass::arity() const {
         return init_method->second.getFunction()->arity();
     }
     return 0;
+}
+
+LoxObject LoxClass::get(Token name) {
+    auto value = class_fields.find(name.lexeme);
+    if (value != class_fields.end()) {
+        return value->second;
+    }
+    return this->class_function(name);
+}
+
+LoxObject LoxClass::set(Token name, LoxObject value) {
+    return class_fields[name.lexeme] = value;
 }
 
 

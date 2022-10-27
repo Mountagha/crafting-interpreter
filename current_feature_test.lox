@@ -1,13 +1,14 @@
-class Cake {
-    taste() {
-        var adjective = "delicious";
-        print "The " + this.flavor + " cake is " + adjective + "!";
+class Math {
+    class square(n) {
+        return n * n;
+    } 
+    square2(n) {
+        return n * n;
     }
-    class test_class_method() {
-        print "we in business";
-    }
+
 }
-var cake = Cake();
-cake.flavor = "German chocolate";
-cake.taste(); // should print "the German chocolate cake is delicious!"
-Cake.test_class_method();
+
+print Math().square2(3); // should print 9.
+Math.p1 = 4; // should print 4.
+print Math.p1;
+print Math.square(3); // should print 9.

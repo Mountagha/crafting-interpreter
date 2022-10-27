@@ -77,6 +77,13 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 resolveFunction(*method, declaration); // not sure if this is a good practice.
             }
 
+            // resolve class methods.
+            for (auto& c_method: stmt.class_methods) {
+                FunctionType declaration = FunctionType::CLASS_METHOD;
+                resolveFunction(*c_method, declaration); // not sure if this is a good practice.
+            }
+ 
+
             endScope();
 
             if (stmt.superclass) endScope();
