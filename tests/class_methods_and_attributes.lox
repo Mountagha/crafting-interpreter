@@ -8,7 +8,10 @@ class Math {
 
 }
 
+class subMath < Math {}
+
 print Math().square2(3); // should print 9.
 Math.p1 = 4; // should print 4.
 print Math.p1;
 print Math.square(3); // should print 9.
+print subMath.square(3);
