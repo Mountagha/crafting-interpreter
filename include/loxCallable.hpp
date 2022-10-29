@@ -39,7 +39,7 @@ class TimeFunction : public LoxCallable {
 
 class LoxFunction : public LoxCallable {
     public:
-        LoxFunction(Function* declaration, Interpreter* inpt, PEnvironment encl, bool isInit = false);
+        LoxFunction(Function* declaration, Interpreter* intp, PEnvironment encl, bool isInit = false);
         LoxFunction(LoxFunction& other, PEnvironment encl);
         ~LoxFunction();
         size_t arity() const override { return declaration->params.size(); }
@@ -60,35 +60,39 @@ class LoxFunction : public LoxCallable {
         Interpreter* interpreter;
         PEnvironment enclosing;
 };
+class LoxClass;
 
-class LoxInstance;
+class LoxInstance {
+    public:
+        LoxInstance() = default;
+        LoxInstance(LoxClass* klass_); 
+        std::string name() const { return "<instance " + cname.lexeme + ">"; }
+        LoxObject get(Token name);
+        LoxObject set(Token name, LoxObject value);
+        virtual ~LoxInstance() = default;   // so that I can use dynamic_cast.
+    private:
+        LoxClass* klass; 
+        Token cname;
+        std::map<std::string, LoxObject> fields {};
+};
 
-class LoxClass : public LoxCallable {
+class LoxClass : public LoxCallable, public LoxInstance {
     public:
         LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnvironment encl);
         std::string name() const override { return "<class " + cname.lexeme + ">"; }
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
         LoxObject function(Token name, LoxInstance* instance);
+        LoxObject get(Token name);
+        LoxObject set(Token name, LoxObject value);
         size_t arity() const override;
     private:
         Interpreter* interpreter;
         LoxClass* super;
         Token cname;
         std::map<std::string, LoxObject> methods {};
+        std::map<std::string, LoxObject> class_fields {};
         friend class LoxInstance;
 
-};
-
-class LoxInstance {
-    public:
-        LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
-        std::string name() const { return "<instance " + cname.lexeme + ">"; }
-        LoxObject get(Token name);
-        LoxObject set(Token name, LoxObject value);
-    private:
-        LoxClass* klass; 
-        Token cname;
-        std::map<std::string, LoxObject> fields {};
 };
 
 } // lox namespace

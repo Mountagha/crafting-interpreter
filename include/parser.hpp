@@ -62,7 +62,12 @@ class Parser {
 
             std::vector<std::unique_ptr<Function>> methods;
             while (!check(RIGHT_BRACE) && !isAtEnd()) {
-                auto m = function("method");
+                SExpr m;
+                if (match ({CLASS})) { // class method declaration.
+                    m = function("class_method");
+                } else { // object method declaration.
+                    m = function("method");
+                }
                 methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
             }
 

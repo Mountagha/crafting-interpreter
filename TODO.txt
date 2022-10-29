@@ -1,0 +1,4 @@
+1- Do not forget to get back to variables arrayLookup instead of tableLookup for efficiency.
+2- Since we support method class and that a class is also an instance via inheritance mechanism
+maybe we should get rid of class and only stick to instance and let the magic of polymorphism operate OR NOT.
+3- Fix the warning on both GCC on linux and clang on mac. 

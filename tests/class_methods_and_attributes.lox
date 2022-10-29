@@ -1,0 +1,17 @@
+class Math {
+    class square(n) {
+        return n * n;
+    } 
+    square2(n) {
+        return n * n;
+    }
+
+}
+
+class subMath < Math {} // testing class methods through inheritance.
+
+print Math().square2(3); // should print 9.
+Math.p1 = 4; // should print 4.
+print Math.p1;
+print Math.square(3); // should print 9.
+print subMath.square(3); // should also print 9.

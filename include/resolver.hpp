@@ -52,7 +52,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             if (stmt.superclass) {
                 
                 auto superclassName = static_cast<Variable*>(stmt.superclass.get())->name;
-                if (stmt.superclass && (stmt.name.lexeme == superclassName.lexeme)) {
+                if (stmt.name.lexeme == superclassName.lexeme) {
                     Lox::error(superclassName, "A class can't inherit from itself.");
                 }
 
@@ -90,7 +90,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 resolve(stmt.initializer);
             }
             define(stmt.name);
-            var_initializations.back()[stmt.name.lexeme] = false;
+            if (!var_initializations.empty()) {
+                var_initializations.back()[stmt.name.lexeme] = false;
+            }
         }
 
         LoxObject visitVariableExpr(Variable& expr) override {
@@ -100,7 +102,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                     Lox::error(expr.name, 
                         "Can't read local variable in its own initializer");
             }
-            var_initializations.back()[expr.name.lexeme] = true;
+            if (!var_initializations.empty()) {
+                var_initializations.back()[expr.name.lexeme] = true;
+            }
 
             resolveLocal(expr, expr.name);
             return LoxObject();
@@ -211,6 +215,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             if (currentClass == ClassType::NONE) {
                 Lox::error(expr.keyword, "Can't use 'this' outside of a class.");
             }
+            if (currentFunction == FunctionType::CLASS_METHOD) {
+                Lox::error(expr.keyword, "Can't use 'this' inside method class.");
+            }
             resolveLocal(expr, expr.keyword);
             return LoxObject();
         }
@@ -238,7 +245,8 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             NONE,
             FUNCTION,
             INITIALIZER,
-            METHOD
+            METHOD,
+            CLASS_METHOD
         };
         
         ClassType currentClass {ClassType::NONE};

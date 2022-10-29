@@ -58,7 +58,9 @@ LoxObject LoxClass::function(Token name, LoxInstance* instance) {
     if (var != methods.end()) {
         LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction()); 
         PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
-        environment->define("this", LoxObject(instance, interpreter));
+        if (auto obj = dynamic_cast<LoxClass *>(instance); obj == nullptr) { // if we got an instance instead of class.
+            environment->define("this", LoxObject(instance, interpreter));
+        }
         auto* new_method = interpreter->createFunction(func, environment); 
         return LoxObject(new_method, interpreter);
     }
@@ -90,6 +92,21 @@ size_t LoxClass::arity() const {
     }
     return 0;
 }
+
+LoxObject LoxClass::get(Token name) {
+    auto value = class_fields.find(name.lexeme);
+    if (value != class_fields.end()) {
+        return value->second;
+    }
+    return function(name, this);
+}
+
+LoxObject LoxClass::set(Token name, LoxObject value) {
+    return class_fields[name.lexeme] = value;
+}
+
+
+LoxInstance::LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
 
 LoxObject LoxInstance::get(Token name) {
     auto value = fields.find(name.lexeme);
