@@ -57,11 +57,10 @@ class Block: public Stmt {
 
 class Class: public Stmt {
 	public:
-		Class(Token name_, std::unique_ptr<Expr>&& superclass_, std::vector<std::unique_ptr<Function>>&& methods_, std::vector<std::unique_ptr<Function>>&& class_methods_) {
+		Class(Token name_, std::unique_ptr<Expr>&& superclass_, std::vector<std::unique_ptr<Function>>&& methods_) {
 			name = name_;
 			superclass = std::move (superclass_);
 			methods = std::move (methods_);
-			class_methods = std::move (class_methods_);
 		}
 		void accept(StmtVisitor& visitor) override {
 			visitor.visitClassStmt(*this);
@@ -69,7 +68,6 @@ class Class: public Stmt {
 		Token name;
 		std::unique_ptr<Expr> superclass;
 		std::vector<std::unique_ptr<Function>> methods;
-		std::vector<std::unique_ptr<Function>> class_methods;
 };
 
 class Expression: public Stmt {

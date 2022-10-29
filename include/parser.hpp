@@ -63,18 +63,18 @@ class Parser {
             std::vector<std::unique_ptr<Function>> methods;
             std::vector<std::unique_ptr<Function>> class_methods;
             while (!check(RIGHT_BRACE) && !isAtEnd()) {
-                if (match ({CLASS})) {
-                    auto m = function("class_method");
-                    class_methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
-                } else {
-                    auto m = function("method");
-                    methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
+                SExpr m;
+                if (match ({CLASS})) { // class method declaration.
+                    m = function("class_method");
+                } else { // object method declaration.
+                    m = function("method");
                 }
+                methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
             }
 
             consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-            return std::make_unique<Class>(name, std::move(superclass), std::move(methods), std::move(class_methods));
+            return std::make_unique<Class>(name, std::move(superclass), std::move(methods));
         }
 
         SExpr statement() {

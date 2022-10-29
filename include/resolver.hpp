@@ -52,7 +52,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
             if (stmt.superclass) {
                 
                 auto superclassName = static_cast<Variable*>(stmt.superclass.get())->name;
-                if (stmt.superclass && (stmt.name.lexeme == superclassName.lexeme)) {
+                if (stmt.name.lexeme == superclassName.lexeme) {
                     Lox::error(superclassName, "A class can't inherit from itself.");
                 }
 
@@ -76,13 +76,6 @@ class Resolver : public ExprVisitor, public StmtVisitor {
                 }
                 resolveFunction(*method, declaration); // not sure if this is a good practice.
             }
-
-            // resolve class methods.
-            for (auto& c_method: stmt.class_methods) {
-                FunctionType declaration = FunctionType::CLASS_METHOD;
-                resolveFunction(*c_method, declaration); // not sure if this is a good practice.
-            }
- 
 
             endScope();
 
@@ -221,6 +214,9 @@ class Resolver : public ExprVisitor, public StmtVisitor {
         LoxObject visitThisExpr(This& expr) override {
             if (currentClass == ClassType::NONE) {
                 Lox::error(expr.keyword, "Can't use 'this' outside of a class.");
+            }
+            if (currentFunction == FunctionType::CLASS_METHOD) {
+                Lox::error(expr.keyword, "Can't use 'this' inside method class.");
             }
             resolveLocal(expr, expr.keyword);
             return LoxObject();

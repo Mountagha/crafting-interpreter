@@ -49,12 +49,6 @@ LoxClass::LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnviro
         auto* method = interpreter->createFunction(m.get(), encl, isInit);
         methods[m->name.lexeme] = LoxObject(method, intp);
     }
-
-    for (auto& m: stmt->class_methods) {
-        auto* class_method = interpreter->createFunction(m.get(), encl);
-        class_methods[m->name.lexeme] = LoxObject(class_method, intp);
-    }
-
 }
 
 LoxObject LoxClass::function(Token name, LoxInstance* instance) {
@@ -63,7 +57,9 @@ LoxObject LoxClass::function(Token name, LoxInstance* instance) {
     if (var != methods.end()) {
         LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction()); 
         PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
-        environment->define("this", LoxObject(instance, interpreter));
+        if (auto obj = dynamic_cast<LoxClass *>(instance); obj == nullptr) { // if we got an instance instead of class.
+            environment->define("this", LoxObject(instance, interpreter));
+        }
         auto* new_method = interpreter->createFunction(func, environment); 
         return LoxObject(new_method, interpreter);
     }
@@ -72,22 +68,6 @@ LoxObject LoxClass::function(Token name, LoxInstance* instance) {
     // maybe create later a custom runtimeError in order to print
     // the line and/or the file along with the error message.
 }
-
-LoxObject LoxClass::class_function(Token name) {
-    // possible leak in this function. Check later.
-    auto var = class_methods.find(name.lexeme);
-    if (var != class_methods.end()) {
-        LoxFunction* func = static_cast<LoxFunction*>(var->second.getFunction()); 
-        PEnvironment environment = std::make_shared<Environment>(func->getEnclosing());
-        auto* new_method = interpreter->createFunction(func, environment); 
-        return LoxObject(new_method, interpreter);
-    }
-    if (super) return super->class_function(name); 
-    throw std::runtime_error("Undefined property '" + name.lexeme + "'.");
-    // maybe create later a custom runtimeError in order to print
-    // the line and/or the file along with the error message.
-}
-
 
 LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
 
@@ -117,7 +97,7 @@ LoxObject LoxClass::get(Token name) {
     if (value != class_fields.end()) {
         return value->second;
     }
-    return this->class_function(name);
+    return function(name, this);
 }
 
 LoxObject LoxClass::set(Token name, LoxObject value) {

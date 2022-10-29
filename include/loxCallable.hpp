@@ -69,6 +69,7 @@ class LoxInstance {
         std::string name() const { return "<instance " + cname.lexeme + ">"; }
         LoxObject get(Token name);
         LoxObject set(Token name, LoxObject value);
+        virtual ~LoxInstance() = default;   // so that I can use dynamic_cast.
     private:
         LoxClass* klass; 
         Token cname;
@@ -81,7 +82,6 @@ class LoxClass : public LoxCallable, public LoxInstance {
         std::string name() const override { return "<class " + cname.lexeme + ">"; }
         LoxObject operator()(Interpreter& in, std::vector<LoxObject> args) override ;
         LoxObject function(Token name, LoxInstance* instance);
-        LoxObject class_function(Token name);
         LoxObject get(Token name);
         LoxObject set(Token name, LoxObject value);
         size_t arity() const override;
@@ -91,7 +91,6 @@ class LoxClass : public LoxCallable, public LoxInstance {
         Token cname;
         std::map<std::string, LoxObject> methods {};
         std::map<std::string, LoxObject> class_fields {};
-        std::map<std::string, LoxObject> class_methods {};
         friend class LoxInstance;
 
 };

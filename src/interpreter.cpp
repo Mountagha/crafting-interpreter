@@ -17,7 +17,7 @@ Interpreter::~Interpreter() {
     // Manually delete objects since functions assume their 
     // interpreter is valid when they are destroyed.
     
-    // Note: this is a hack to avoid double-destruction
+    // Note: the m_destroying is a hack to avoid double-destruction
     m_destroying = true;
     m_instances.clear();
     m_classes.clear();

@@ -9,11 +9,15 @@ Breakthrough: After doing some experimentations I found that the order
 in which the methods are defined makes a difference.
 the last one to be defined will erased the previous one whether they 
 are object or class methods which again reinforces my thesis that they
-are all stored in the same container. We will adopt the same method with lox. 
+are all stored in the same container. 
+Variables attributes and objects attributes are stored in separated places.
+We will adopt the same method with lox. 
 """
 class A: 
+    var_a = 0
     def __init__(self, x) -> None:
         self.x = x
+        self.var_a = 5
     def m():
         print("Class method")
     def m(self):
@@ -23,3 +27,4 @@ if __name__ == "__main__":
     a = A(5)
     # A.m()
     a.m() # failed to execute.
+    print(A.var_a)
