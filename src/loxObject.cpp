@@ -86,7 +86,7 @@ LoxObject LoxObject::get(Token name) {
     } else if (lox_type == LoxType::Class) {
         return loxklass->get(name);
     }
-    throw std::runtime_error("Cannot get property from a non-class instance");
+    throw std::runtime_error("Cannot get property from a non-class or a non-class instance");
 }
 
 LoxObject LoxObject::set(Token name, LoxObject value) {
@@ -95,7 +95,7 @@ LoxObject LoxObject::set(Token name, LoxObject value) {
     } else if (lox_type == LoxType::Class) {
         return loxklass->set(name, value);
     }
-    throw std::runtime_error("Cannot set property on non-class instance.");
+    throw std::runtime_error("Cannot set property on non-class or non-class instance.");
 }
 
 LoxObject LoxObject::operator()(Interpreter& in, std::vector<LoxObject> args) {
