@@ -61,7 +61,6 @@ class Parser {
             consume(LEFT_BRACE, "Expect '{' before class body.");
 
             std::vector<std::unique_ptr<Function>> methods;
-            std::vector<std::unique_ptr<Function>> class_methods;
             while (!check(RIGHT_BRACE) && !isAtEnd()) {
                 SExpr m;
                 if (match ({CLASS})) { // class method declaration.

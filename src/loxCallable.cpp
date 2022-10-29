@@ -44,6 +44,7 @@ LoxClass::LoxClass(Class* stmt, LoxClass* superClass, Interpreter* intp, PEnviro
     super = superClass;
     interpreter = intp;
     bool isInit {false};
+
     for (auto& m: stmt->methods) {
         isInit = m->name.lexeme == "init" ? true : false;
         auto* method = interpreter->createFunction(m.get(), encl, isInit);
