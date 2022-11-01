@@ -65,7 +65,7 @@ class Parser {
                 SExpr m;
                 if (match ({CLASS})) { // class method declaration.
                     m = function("class_method");
-                } else { // object method declaration.
+                } else { // object method declaration or getter.
                     m = function("method");
                 }
                 methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
@@ -193,20 +193,22 @@ class Parser {
 
         SExpr function(std::string kind) {
             Token name = consume(IDENTIFIER, "Expect " + kind + " name");
-            consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
             std::vector<Token> parameters {};
-            if (!check(RIGHT_PARENT)){
-                do {
-                    if (parameters.size() >= 255) {
-                        Lox::error(peek(), "Can't have more than 255 parameters");
-                    }
+            if (check(LEFT_PAREN)) { // getter methods do not have braces hence this condition.
+                consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+                if (!check(RIGHT_PARENT)){
+                    do {
+                        if (parameters.size() >= 255) {
+                            Lox::error(peek(), "Can't have more than 255 parameters");
+                        }
 
-                    parameters.push_back(
-                        consume(IDENTIFIER, "Expect parameter name.")
-                    );
-                } while (match ({COMMA}));
+                        parameters.push_back(
+                            consume(IDENTIFIER, "Expect parameter name.")
+                        );
+                    } while (match ({COMMA}));
+                }
+                consume(RIGHT_PARENT, "Expect ')' after parameteres.");
             }
-            consume(RIGHT_PARENT, "Expect ')' after parameteres.");
 
             consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
             std::vector<SExpr> body = block();

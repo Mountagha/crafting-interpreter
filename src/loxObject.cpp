@@ -118,7 +118,6 @@ LoxObject LoxObject::operator()(Interpreter& in, std::vector<LoxObject> args) {
         throw std::runtime_error(msg);
     }
     return (*function)(in, args);
-    // return LoxObject();
 }
 
 LoxObject::LoxObject(Token token) {
