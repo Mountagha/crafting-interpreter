@@ -69,6 +69,9 @@ class LoxInstance {
         std::string name() const { return "<instance " + cname.lexeme + ">"; }
         LoxObject get(Token name);
         LoxObject set(Token name, LoxObject value);
+        LoxClass* getClass() const { return klass; };
+        bool isGetter(Token name) const; 
+        LoxObject callGetter(Token name);
         virtual ~LoxInstance() = default;   // so that I can use dynamic_cast.
     private:
         LoxClass* klass; 
@@ -85,6 +88,7 @@ class LoxClass : public LoxCallable, public LoxInstance {
         LoxObject get(Token name);
         LoxObject set(Token name, LoxObject value);
         size_t arity() const override;
+        bool hasMethod(const Token name) const { return methods.count(name.lexeme) > 0; }
     private:
         Interpreter* interpreter;
         LoxClass* super;

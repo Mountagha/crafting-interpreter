@@ -104,7 +104,14 @@ LoxObject LoxClass::get(Token name) {
 LoxObject LoxClass::set(Token name, LoxObject value) {
     return class_fields[name.lexeme] = value;
 }
+bool LoxInstance::isGetter(Token name) const {
+    return klass->hasMethod(name);
+}
 
+LoxObject LoxInstance::callGetter(Token name) {
+    Arguments args;
+    return klass->function(name, this)(*klass->interpreter, args);
+}
 
 LoxInstance::LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
 
@@ -113,6 +120,7 @@ LoxObject LoxInstance::get(Token name) {
     if (value != fields.end()) {
         return value->second;
     }
+    if (isGetter(name)) callGetter(name); 
     return klass->function(name, this);
 }
 

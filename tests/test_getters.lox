@@ -9,4 +9,4 @@ class Circle {
 }
 
 var circle = Circle(4);
-print circle.area(); // Should roughly prints 50.26
+print circle.area; // Should roughly prints 50.26
