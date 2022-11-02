@@ -206,6 +206,7 @@ LoxObject Interpreter::visitCommaExprExpr(CommaExpr& expr) {
 }
 
 LoxObject Interpreter::visitGetExpr(Get& expr) {
+    // check if it is a usual getter evaluate it otherwise call it ?
     LoxObject object = evaluate(expr.object);
     return object.get(expr.name);
 }
