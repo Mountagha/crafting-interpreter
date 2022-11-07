@@ -5,7 +5,7 @@ do
     if [[ $f == *.lox ]]
     then
         echo -e "==== Running test for $f====\n"
-        $1 $f 
+        ./build/interpreter $f 
         echo -e "\n"
     fi
 done

@@ -53,9 +53,14 @@ class LoxFunction : public LoxCallable {
         Function* getDeclaration() {
             return declaration;
         }
+
+        bool isGetter() const {
+            return getter;
+        }
     
     private:
         bool isInitializer;
+        bool getter;
         Function* declaration;
         Interpreter* interpreter;
         PEnvironment enclosing;
@@ -69,6 +74,7 @@ class LoxInstance {
         std::string name() const { return "<instance " + cname.lexeme + ">"; }
         LoxObject get(Token name);
         LoxObject set(Token name, LoxObject value);
+        LoxClass* getClass() const { return klass; };
         virtual ~LoxInstance() = default;   // so that I can use dynamic_cast.
     private:
         LoxClass* klass; 

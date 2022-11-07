@@ -83,8 +83,9 @@ class Expression: public Stmt {
 
 class Function: public Stmt {
 	public:
-		Function(Token name_, std::vector<Token>&& params_, std::vector<std::unique_ptr<Stmt>>&& body_) {
+		Function(Token name_, std::string kind_, std::vector<Token>&& params_, std::vector<std::unique_ptr<Stmt>>&& body_) {
 			name = name_;
+			kind = kind_;
 			params = std::move (params_);
 			body = std::move (body_);
 		}
@@ -92,6 +93,7 @@ class Function: public Stmt {
 			visitor.visitFunctionStmt(*this);
 		}
 		Token name;
+		std::string kind;
 		std::vector<Token> params;
 		std::vector<std::unique_ptr<Stmt>> body;
 };

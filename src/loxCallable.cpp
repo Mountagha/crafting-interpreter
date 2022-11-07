@@ -10,6 +10,7 @@ LoxFunction::LoxFunction(Function* decl, Interpreter* intp, std::shared_ptr<Envi
     declaration = decl;
     enclosing = encl;
     isInitializer = isInit;
+    getter = decl->kind == "getter" ? true : false;
     interpreter = intp;
     interpreter->registerFunction(this, std::make_shared<Environment>(enclosing));
 }
@@ -17,6 +18,7 @@ LoxFunction::LoxFunction(Function* decl, Interpreter* intp, std::shared_ptr<Envi
 LoxFunction::LoxFunction(LoxFunction& other, std::shared_ptr<Environment> encl) {
     declaration = other.declaration;
     enclosing = encl;
+    getter = other.getter;
     isInitializer = other.isInitializer;
     interpreter = other.interpreter;
     interpreter->registerFunction(this, enclosing);
@@ -62,6 +64,11 @@ LoxObject LoxClass::function(Token name, LoxInstance* instance) {
             environment->define("this", LoxObject(instance, interpreter));
         }
         auto* new_method = interpreter->createFunction(func, environment); 
+        if (new_method->isGetter()){
+            // if it's a getter we call it directly.
+            Arguments args;
+            return LoxObject(new_method, interpreter)(*interpreter, args);
+        } 
         return LoxObject(new_method, interpreter);
     }
     if (super) return super->function(name, instance); 
@@ -104,7 +111,6 @@ LoxObject LoxClass::get(Token name) {
 LoxObject LoxClass::set(Token name, LoxObject value) {
     return class_fields[name.lexeme] = value;
 }
-
 
 LoxInstance::LoxInstance(LoxClass* klass_): klass{klass_} { cname = klass->cname; }
 

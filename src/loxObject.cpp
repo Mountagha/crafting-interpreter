@@ -113,12 +113,11 @@ LoxObject LoxObject::operator()(Interpreter& in, std::vector<LoxObject> args) {
     }
     if (args.size() != function->arity()){
         std::string msg = "Function argument count mismatch. Expected "
-            + std::to_string(function->arity()) + ", got" 
+            + std::to_string(function->arity()) + ", got " 
             + std::to_string(args.size()) + "\n";
         throw std::runtime_error(msg);
     }
     return (*function)(in, args);
-    // return LoxObject();
 }
 
 LoxObject::LoxObject(Token token) {

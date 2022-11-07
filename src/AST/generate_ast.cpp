@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
         {"Block", "std::vector<std::unique_ptr<Stmt>> statements"},
         {"Class", "Token name, Expr* superclass, std::vector<std::unique_ptr<Function>> methods"},
         {"Expression", "Expr* expression"},
-        {"Function", "Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body"},
+        {"Function", "Token name, std::string kind, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body"},
         {"If", "Expr* condition, Stmt* thenBranch, Stmt* elseBranch"},
         {"Print", "Expr* expression"},
         {"Return", "Token keyword, Expr* value"},

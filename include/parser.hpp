@@ -62,12 +62,7 @@ class Parser {
 
             std::vector<std::unique_ptr<Function>> methods;
             while (!check(RIGHT_BRACE) && !isAtEnd()) {
-                SExpr m;
-                if (match ({CLASS})) { // class method declaration.
-                    m = function("class_method");
-                } else { // object method declaration.
-                    m = function("method");
-                }
+                auto m = function("method");
                 methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
             }
 
@@ -192,25 +187,29 @@ class Parser {
         }
 
         SExpr function(std::string kind) {
+            if (match ({CLASS})) kind = "class_method";
             Token name = consume(IDENTIFIER, "Expect " + kind + " name");
-            consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
             std::vector<Token> parameters {};
-            if (!check(RIGHT_PARENT)){
-                do {
-                    if (parameters.size() >= 255) {
-                        Lox::error(peek(), "Can't have more than 255 parameters");
-                    }
+            if (check(LEFT_PAREN)) { // getter methods do not have braces hence this condition.
+                consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+                if (!check(RIGHT_PARENT)){
+                    do {
+                        if (parameters.size() >= 255) {
+                            Lox::error(peek(), "Can't have more than 255 parameters");
+                        }
 
-                    parameters.push_back(
-                        consume(IDENTIFIER, "Expect parameter name.")
-                    );
-                } while (match ({COMMA}));
+                        parameters.push_back(
+                            consume(IDENTIFIER, "Expect parameter name.")
+                        );
+                    } while (match ({COMMA}));
+                }
+                consume(RIGHT_PARENT, "Expect ')' after parameteres.");
+            } else {
+                kind = "getter";
             }
-            consume(RIGHT_PARENT, "Expect ')' after parameteres.");
-
             consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
             std::vector<SExpr> body = block();
-            return std::make_unique<Function>(name, std::move(parameters), std::move(body));
+            return std::make_unique<Function>(name, kind, std::move(parameters), std::move(body));
         }
 
         std::vector<SExpr> block() {
