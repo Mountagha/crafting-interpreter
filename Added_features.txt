@@ -1,0 +1,9 @@
+NB: At some points this file will be github readme format. This is juste to keep track of features
+I added via challenges.
+chap 12:
+- support method class call.
+- support getters
+
+chap 11:
+- resovler support not used local variable report.
+
