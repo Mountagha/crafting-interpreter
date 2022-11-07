@@ -53,9 +53,14 @@ class LoxFunction : public LoxCallable {
         Function* getDeclaration() {
             return declaration;
         }
+
+        bool isGetter() const {
+            return getter;
+        }
     
     private:
         bool isInitializer;
+        bool getter;
         Function* declaration;
         Interpreter* interpreter;
         PEnvironment enclosing;
@@ -70,8 +75,6 @@ class LoxInstance {
         LoxObject get(Token name);
         LoxObject set(Token name, LoxObject value);
         LoxClass* getClass() const { return klass; };
-        bool isGetter(Token name) const; 
-        LoxObject callGetter(Token name);
         virtual ~LoxInstance() = default;   // so that I can use dynamic_cast.
     private:
         LoxClass* klass; 
@@ -88,7 +91,6 @@ class LoxClass : public LoxCallable, public LoxInstance {
         LoxObject get(Token name);
         LoxObject set(Token name, LoxObject value);
         size_t arity() const override;
-        bool hasMethod(const Token name) const { return methods.count(name.lexeme) > 0; }
     private:
         Interpreter* interpreter;
         LoxClass* super;
