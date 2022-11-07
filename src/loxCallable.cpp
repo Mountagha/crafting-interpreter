@@ -120,7 +120,7 @@ LoxObject LoxInstance::get(Token name) {
     if (value != fields.end()) {
         return value->second;
     }
-    if (isGetter(name)) callGetter(name); 
+    //if (isGetter(name)) callGetter(name); 
     return klass->function(name, this);
 }
 

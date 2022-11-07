@@ -62,12 +62,7 @@ class Parser {
 
             std::vector<std::unique_ptr<Function>> methods;
             while (!check(RIGHT_BRACE) && !isAtEnd()) {
-                SExpr m;
-                if (match ({CLASS})) { // class method declaration.
-                    m = function("class_method");
-                } else { // object method declaration or getter.
-                    m = function("method");
-                }
+                auto m = function("method");
                 methods.push_back(std::unique_ptr<Function>(static_cast<Function*>(m.release())));
             }
 
@@ -192,6 +187,7 @@ class Parser {
         }
 
         SExpr function(std::string kind) {
+            if (match ({CLASS})) kind = "class_method";
             Token name = consume(IDENTIFIER, "Expect " + kind + " name");
             std::vector<Token> parameters {};
             if (check(LEFT_PAREN)) { // getter methods do not have braces hence this condition.
@@ -208,11 +204,13 @@ class Parser {
                     } while (match ({COMMA}));
                 }
                 consume(RIGHT_PARENT, "Expect ')' after parameteres.");
+            } else {
+                kind = "getter";
             }
 
             consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
             std::vector<SExpr> body = block();
-            return std::make_unique<Function>(name, std::move(parameters), std::move(body));
+            return std::make_unique<Function>(name, kind, std::move(parameters), std::move(body));
         }
 
         std::vector<SExpr> block() {
