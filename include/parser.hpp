@@ -207,7 +207,6 @@ class Parser {
             } else {
                 kind = "getter";
             }
-
             consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
             std::vector<SExpr> body = block();
             return std::make_unique<Function>(name, kind, std::move(parameters), std::move(body));
