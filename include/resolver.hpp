@@ -243,6 +243,7 @@ class Resolver : public ExprVisitor, public StmtVisitor {
 
         enum class FunctionType {
             NONE,
+            LAMBDA,
             FUNCTION,
             INITIALIZER,
             METHOD,
