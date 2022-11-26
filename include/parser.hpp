@@ -402,8 +402,29 @@ class Parser {
             return std::make_unique<CommaExpr>(std::move(commaExps));
         }
 
+        PExpr parseLambda() {
+            std::vector<Token> parameters{};
+            consume(LEFT_PAREN, "Expect '(' after lambdas declaration.");
+                if (!check(RIGHT_PARENT)){
+                    do {
+                        if (parameters.size() >= 255) {
+                            Lox::error(peek(), "Can't have more than 255 parameters");
+                        }
+
+                        parameters.push_back(
+                            consume(IDENTIFIER, "Expect parameter name.")
+                        );
+                    } while (match ({COMMA}));
+                }
+            consume(RIGHT_PARENT, "Expect ')' after parameteres.");
+            consume(LEFT_BRACE, "Expect '{' before lambda body.");
+            std::vector<SExpr> body = block();
+        }
+
         PExpr finishCall(PExpr& callee) {
             // TODO: make call support lambdas.
+            //if (match ({FUN})) parseLambda();
+
             std::vector<PExpr> arguments;
             if (!check(RIGHT_PARENT)) {
                 do {
