@@ -403,6 +403,7 @@ class Parser {
         }
 
         PExpr finishCall(PExpr& callee) {
+            // TODO: make call support lambdas.
             std::vector<PExpr> arguments;
             if (!check(RIGHT_PARENT)) {
                 do {
