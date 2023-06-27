@@ -82,11 +82,11 @@ LoxObject LoxClass::operator()(Interpreter& intp, std::vector<LoxObject> args) {
     if (&intp != interpreter) {
         std::runtime_error("class constructed in different interpreter.");
     }
-
     LoxInstance* instance = interpreter->createInstance(this); 
     auto instance_object = LoxObject(instance, &intp);
     if (methods.find("init") != methods.end()) {
-        // we are giving the line of the token 0 cause we don't care. We just want to retrieve the init method using its name. 
+        // we are giving the line of the token 0 cause we don't care. 
+        //We just want to retrieve the init method using its name. 
         instance_object.getInstance()->get({IDENTIFIER, "init", 0})(intp, args);
     }
     return instance_object;  
